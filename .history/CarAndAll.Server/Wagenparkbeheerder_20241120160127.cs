@@ -1,0 +1,1 @@
+public List<string> SchadeRegistratie();
