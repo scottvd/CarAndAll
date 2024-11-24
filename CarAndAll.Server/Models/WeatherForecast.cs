@@ -1,4 +1,4 @@
-namespace CarAndAll.Server
+namespace CarAndAll.Server.Models
 {
     public class WeatherForecast
     {
