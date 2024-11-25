@@ -1,16 +1,25 @@
-using System;
+    using System.ComponentModel.DataAnnotations;
 
-namespace CarAndAll.Server.Models
-{
-    interface IMedewerker
+    namespace CarAndAll.Server.Models
     {
-        int Personeelsnummer { get; set; }
-        Account Account { get; set; }
-    }
+        public class Medewerker
+        {
+            [Key]
+            public int PersoneelsNummer { get; set; }
 
-    public class Medewerker : IMedewerker
-    {
-        public required int Personeelsnummer { get; set; }
-        public required Account Account { get; set; }
+            [Required, MaxLength(255)]
+            public string Naam { get; set; }
+
+            [Required, MaxLength(255)]
+            public string Adres { get; set; }
+
+            [Required, MaxLength(255)]
+            public string Email { get; set; }
+
+            public List<Schademelding> Schademeldingen { get; set; }
+
+            public List<Notitie> Notities { get; set; }
+
+            public List<Foto> Fotos { get; set; }
+        }
     }
-}
