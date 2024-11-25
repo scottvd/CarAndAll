@@ -1,14 +1,18 @@
 using CarAndAll.Server.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace YourNamespace
+namespace CarAndAll.Server.Data
 {
-    public class CarAndAllContext : DbContext
+    public class CarAndAllContext : IdentityDbContext<Gebruiker>
     {
         protected override void OnConfiguring(DbContextOptionsBuilder b) => b.UseSqlite("Data Source=database.db");
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Medewerker>().HasKey(m => m.PersoneelsNummer);
+            modelBuilder.Entity<Medewerker>().HasIndex(m => m.PersoneelsNummer).IsUnique();
         }
 
         public DbSet<Abonnement> Abonnementen { get; set; }

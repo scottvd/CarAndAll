@@ -1,7 +1,8 @@
+using CarAndAll.Server.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using YourNamespace;
 
 namespace CarAndAll.Server
 {
@@ -18,6 +19,8 @@ namespace CarAndAll.Server
 
             // Register other services, e.g., controllers, etc.
             builder.Services.AddControllers();
+            builder.Services.AddAuthorization();
+            builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
 
             var app = builder.Build();
 
