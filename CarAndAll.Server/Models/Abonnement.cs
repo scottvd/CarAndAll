@@ -10,6 +10,6 @@ namespace CarAndAll.Server.Models
         [Required]
         public int Prijs { get; set; }
 
-        public List<Klant> Klanten { get; set; }      
+        public List<Klant>? Klanten { get; set; }      
     }
 }

@@ -13,10 +13,6 @@ namespace CarAndAll.Server
             // Create and configure the WebApplication
             var builder = WebApplication.CreateBuilder(args);
 
-            // Register the DbContext with the DI container
-            builder.Services.AddDbContext<CarAndAllContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
             // Register other services, e.g., controllers, etc.
             builder.Services.AddControllers();
             builder.Services.AddAuthorization();

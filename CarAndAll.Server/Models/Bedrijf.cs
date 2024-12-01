@@ -15,6 +15,6 @@ namespace CarAndAll.Server.Models
 
         [Required]
         public List<Klant> Klanten { get; set; } 
-        public Abonnement Abonnement { get; set; }     
+        public Abonnement? Abonnement { get; set; }     
     }
 }
