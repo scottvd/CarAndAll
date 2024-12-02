@@ -9,13 +9,16 @@ import Landing from './pages/Landing.tsx';
 import { Footer } from './components/Footer/Footer.tsx';
 import { NotFound } from './pages/Error.tsx';
 import { Dashboard } from './pages/Dashboard/Dashboard.tsx';
-import { Users } from './pages/Dashboard/Users.tsx';
 import { Aanvragen } from './pages/Abonnement/Aanvragen.tsx';
 
+
+/*
+Router creeert de manier om met de SPA door de verschillende paginas te gaan.
+*/
 const router = createBrowserRouter([
     {
-        path: '/',
-        element: <Landing/>,
+        path: '/', // Het pad (dus de link)
+        element: <Landing/>, // De pagina/component die wordt weergeven door het RouterProvider component.
     },
     {
         path: '/dashboard',
@@ -31,6 +34,7 @@ const router = createBrowserRouter([
         
     }
 ]);
+
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <MantineProvider>

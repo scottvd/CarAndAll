@@ -29,11 +29,12 @@ export function HeroHeader() {
                         navigate("/dashboard");
                         e.preventDefault();
                     }}>
-                        Naar Dashboard
+                        Registreren
                     </Button>
                     <Button className={classes.control} size="lg">
                         Account aanmaken
                     </Button>
+                    
                 </div>
             </div>
         </Container>
