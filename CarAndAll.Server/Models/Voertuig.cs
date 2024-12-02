@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarAndAll.Server.Models
 {
     public class Voertuig {
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int VoertuigID { get; set; }
+        
+        [Required, MaxLength(255)]
         public string Kenteken { get; set; }
 
         [Required, MaxLength(255)]
