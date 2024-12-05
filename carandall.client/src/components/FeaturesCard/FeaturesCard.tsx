@@ -11,7 +11,8 @@ interface FeatureCardProps {
   naam: string,
   price: number,
   description: string,
-  features: Feature[]
+  features: Feature[],
+  clickFunc: () => void,
 }
 export function FeaturesCard(props: FeatureCardProps) {
   const features = props.features.map((feature) => (
@@ -54,7 +55,7 @@ export function FeaturesCard(props: FeatureCardProps) {
             </Text>
           </div>
 
-          <Button radius="xl" style={{ flex: 1 }}>
+          <Button onClick={props.clickFunc} radius="xl" style={{ flex: 1 }}>
             Aanvragen
           </Button>
         </Group>
