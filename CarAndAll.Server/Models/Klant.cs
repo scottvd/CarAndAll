@@ -1,19 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace CarAndAll.Server.Models
 {
-
-    public interface IKlant
+    public class Klant : Gebruiker
     {
-        string Naam { get; set; }
-        string Adres { get; set; }
-        string Email { get; set; }
+        public Bedrijf? Bedrijf { get; set; }
+        public List<Verhuuraanvraag>? Verhuuraanvraagen { get; set; }
     }
-
-    public class Klant : IKlant
-    {
-        public required string Naam { get; set; }
-        public required string Adres { get; set; }
-        public required string Email { get; set; }
-        // Met Get&Set neergezet, zodat het makkelijker is bij de UI gebruik.
-    }
-
 }
