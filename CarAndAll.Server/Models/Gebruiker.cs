@@ -12,7 +12,7 @@ namespace CarAndAll.Server.Models
             [Required, MaxLength(255)]
             public string Adres { get; set; }
 
-            [Required, MaxLength(255)]
+            [Required, MaxLength(255), EmailAddress]
             public string Email { get; set; }
         }
     }
