@@ -3,30 +3,43 @@ import {
   Button,
   Checkbox,
   Container,
+  Input,
+  NativeSelect,
   Paper,
   PasswordInput,
+  rem,
+  Select,
   Text,
   TextInput,
   Title,
 } from '@mantine/core';
 import classes from './AuthenticationForm.module.css';
-import { useForm } from '@mantine/form';
+import { hasLength, isEmail, isInRange, isNotEmpty, matchesField, useForm } from '@mantine/form';
 import { upperFirst, useToggle } from '@mantine/hooks';
+import { IconChevronDown } from '@tabler/icons-react';
 
 
 
 export function RegistrationForm() {
-
-  const [type, toggle] = useToggle(['login', 'register']);
-
   const form = useForm({
+    validateInputOnBlur: true,
     initialValues: {
       email: '',
-      name: '',
+      naam: '',
       password: '',
-      accountType: ''
+      confirmPassword: '',
+      accountType: '',
+      adres: '',
+      kvkNummer: ''
+    },
+    validate: {
+      email: isEmail("Ongeldige e-mail."),
+      naam: isNotEmpty("Naam is verplicht."),
+      password: hasLength({ min: 8 }, 'Password must be at least 8 characters long'),
+      confirmPassword: matchesField('password', 'Passwords do not match'),
     }
   })
+
 
   return (
     <div>
@@ -35,32 +48,81 @@ export function RegistrationForm() {
           Registreren bij CarAndAll!
         </Title>
 
+
+        <NativeSelect
+          required
+          label="Account Type"
+          rightSection={<IconChevronDown style={{ width: rem(16), height: rem(16) }} />}
+          data={['Zakelijk', 'Particulier']}
+          mt="md"
+
+          onChange={(e) => {
+            form.setFieldValue('accountType', e.currentTarget.value);
+            console.log(e.currentTarget.value);
+          }}
+          size="md"
+        />
+
+
+        <TextInput label="Naam"
+          required
+          placeholder="Piet Jan"
+          size="md"
+          {...form.getInputProps("naam")}
+        />
+
         <TextInput label="Email"
-          placeholder="hello@mantine.dev"
-          value={form.values.email}
-          onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-          error={form.errors.email && 'Invalid email'}
-          size="md" />
+          required
+          placeholder="admin@carandall.nl"
+          mt="md"
+          size="md"
+          {...form.getInputProps("email")}
+        />
         <PasswordInput
           required
           label="Password"
           placeholder="Uw wachtwoord"
           mt="md"
           size="md"
-          onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-        // error={form.errors.password && }
-
-
+          {...form.getInputProps("password")}
         />
-        <Checkbox label="Keep me logged in" mt="xl" size="md" />
+
+        <TextInput label="Adres"
+          required
+          placeholder="Hilversumstraat 20"
+          mt="md"
+          size="md"
+          {...form.getInputProps("adres")}
+        />
 
 
-        {type === 'register'}
-        <Button fullWidth mt="xl" size="md">
+
+        {form.values.accountType == "Zakelijk" ?
+          (
+            <TextInput label="KvK-nummer"
+              required
+              placeholder="12345678"
+              size="md"
+              {...form.getInputProps("kvkNummer")}
+            />
+          )
+
+          : <></>
+
+        }
+
+
+
+
+        <Button
+          onClick={(e) => {
+            console.log(form);
+          }}
+          fullWidth mt="xl" size="md">
           Registreren
         </Button>
 
-        <Text ta="center" mt="md">
+        {/* <Text ta="center" mt="md">
           Heeft u nog geen account?{' '}
           <Anchor<'a'> href="#" fw={700} onClick={(event) => {
             console.log(type);
@@ -69,7 +131,7 @@ export function RegistrationForm() {
           }}>
             Registreren
           </Anchor>
-        </Text>
+        </Text> */}
       </Container>
     </div>
   );

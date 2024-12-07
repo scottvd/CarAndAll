@@ -23,9 +23,6 @@ export function Aanvragen() {
         autoClose: 5000,
       });
 
-        fetch("/abonnement/aanvraag/", {
-
-        })
     },
   });
 
