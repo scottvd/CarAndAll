@@ -6,13 +6,21 @@ import '@mantine/notifications/styles.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import Landing from './pages/Landing.tsx';
-import { Footer } from './components/Footer/Footer.tsx';
 import { NotFound } from './pages/Error.tsx';
 import { Dashboard } from './pages/Dashboard/Dashboard.tsx';
 import { Aanvragen } from './pages/Abonnement/Aanvragen.tsx';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import {  RegistrationForm } from './pages/Authentication/RegistrationForm.tsx';
+import axios, {  } from 'axios';
+import { LoginForm } from './pages/Authentication/LoginForm.tsx';
+
+
+export const api = axios.create({
+    baseURL: 'https://localhost:7140',
+    withCredentials: true
+});
+
 
 /*
 Router creeert de manier om met de SPA door de verschillende paginas te gaan.
@@ -36,6 +44,14 @@ const router = createBrowserRouter([
         //     { path: 'abonnement', element: <Aanvragen /> },
         // ]
     },
+    {
+        path: '/login',
+        element: <LoginForm />,
+        // children: [
+        //     { path: 'abonnement', element: <Aanvragen /> },
+        // ]
+    },
+    
     {
         path: '*',
         element: <NotFound />,

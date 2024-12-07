@@ -1,26 +1,25 @@
 import {
-  Anchor,
   Button,
-  Checkbox,
   Container,
-  Input,
   NativeSelect,
-  Paper,
   PasswordInput,
   rem,
-  Select,
-  Text,
   TextInput,
   Title,
 } from '@mantine/core';
 import classes from './AuthenticationForm.module.css';
-import { hasLength, isEmail, isInRange, isNotEmpty, matchesField, useForm } from '@mantine/form';
-import { upperFirst, useToggle } from '@mantine/hooks';
+import { hasLength, isEmail, isNotEmpty, matchesField, useForm } from '@mantine/form';
 import { IconChevronDown } from '@tabler/icons-react';
-
+// import axios from 'axios';
+// import { AxiosError } from 'axios';
+import { api } from '../../main';
+import { notifications } from '@mantine/notifications';
+import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 
 export function RegistrationForm() {
+  const navigate = useNavigate();
   const form = useForm({
     validateInputOnBlur: true,
     initialValues: {
@@ -28,21 +27,81 @@ export function RegistrationForm() {
       naam: '',
       password: '',
       confirmPassword: '',
-      accountType: '',
+      accountType: "Particulier",
       adres: '',
       kvkNummer: ''
     },
     validate: {
       email: isEmail("Ongeldige e-mail."),
       naam: isNotEmpty("Naam is verplicht."),
-      password: hasLength({ min: 8 }, 'Password must be at least 8 characters long'),
-      confirmPassword: matchesField('password', 'Passwords do not match'),
+      password: (value, values) => {
+        if (!value) return 'Password is required';
+        if (!/[^a-zA-Z0-9]/.test(value)) return 'Password moet minimaal 1 niet-alfanumerisch karakter bevatten.';
+        if (!/\d/.test(value)) return 'Wachtwoord moet minimaal 1 cijfer bevatten.';
+        if (!/[A-Z]/.test(value)) return 'Wachtwoord moet minimaal 1 hoofdletter bevatten.';
+        return null;
+      },
+      confirmPassword: matchesField('password', 'Wachtwoord is niet hetzelfde.'),
+      accountType: isNotEmpty("Account type is verplicht."),
+      adres: isNotEmpty("Adres is verplicht."),
+      kvkNummer: (value, values) => {
+        if (values.accountType === 'Zakelijk') {
+          if (!value) {
+            return 'KvK-nummer is verplicht voor zakelijke accounts';
+          }
+          if (!/^\d{8}$/.test(value)) {
+            return 'KvK-nummer moet 8 cijfers bevatten';
+          }
+          // Add more conditions here if needed
+        }
+        return null;
+      }
     }
   })
 
+  const handleSubmit = (values: any) => {
+    console.log(values);
+
+    api.post("/register_dto", {
+      ...values
+    }).
+      then((v) => {
+        console.log(v);
+        notifications.show({
+          title: "Account aangemaakt.",
+          message: "U kunt nu inloggen. U wordt nu doorgeleid..."
+        });
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500)
+      })
+      .catch((err: AxiosError) => {
+        console.log(err.response);
+
+        if (err.response.data[0].code == "DuplicateUserName") {
+          notifications.show({
+            color: 'red',
+            title: 'E-mail al in gebruik.',
+            message: "Probeer een ander email-adres."
+          })
+        } else {
+
+          notifications.show({
+            color: 'red',
+            title: 'Er ging iets mis.',
+            message: "Probeer het zometeen nog eens."
+          })
+        }
+
+
+      });
+  };
+
+
 
   return (
-    <div>
+    <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
       <Container className={classes.form} p={30}>
         <Title order={2} className={classes.title} ta="center" mt="md" mb={50}>
           Registreren bij CarAndAll!
@@ -55,11 +114,7 @@ export function RegistrationForm() {
           rightSection={<IconChevronDown style={{ width: rem(16), height: rem(16) }} />}
           data={['Zakelijk', 'Particulier']}
           mt="md"
-
-          onChange={(e) => {
-            form.setFieldValue('accountType', e.currentTarget.value);
-            console.log(e.currentTarget.value);
-          }}
+          {...form.getInputProps("accountType")}
           size="md"
         />
 
@@ -86,6 +141,15 @@ export function RegistrationForm() {
           size="md"
           {...form.getInputProps("password")}
         />
+        <PasswordInput
+          required
+          label="Wachtwoord-bevestiging"
+          placeholder="Uw wachtwoord"
+          mt="md"
+          size="md"
+          {...form.getInputProps("confirmPassword")}
+        />
+
 
         <TextInput label="Adres"
           required
@@ -94,8 +158,6 @@ export function RegistrationForm() {
           size="md"
           {...form.getInputProps("adres")}
         />
-
-
 
         {form.values.accountType == "Zakelijk" ?
           (
@@ -111,28 +173,15 @@ export function RegistrationForm() {
 
         }
 
-
-
-
         <Button
-          onClick={(e) => {
-            console.log(form);
-          }}
-          fullWidth mt="xl" size="md">
+          type="submit"
+          fullWidth mt="xl"
+          size="md"
+          disabled={!form.isValid()}
+        >
           Registreren
         </Button>
-
-        {/* <Text ta="center" mt="md">
-          Heeft u nog geen account?{' '}
-          <Anchor<'a'> href="#" fw={700} onClick={(event) => {
-            console.log(type);
-            toggle();
-            event.preventDefault();
-          }}>
-            Registreren
-          </Anchor>
-        </Text> */}
       </Container>
-    </div>
+    </form>
   );
 }
