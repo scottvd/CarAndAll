@@ -17,6 +17,7 @@ namespace CarAndAll.Server
             builder.Services.AddControllers();
             builder.Services.AddAuthorization();
             builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
+            builder.Services.AddDbContext<CarAndAllContext>();
 
             var app = builder.Build();
 

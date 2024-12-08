@@ -22,8 +22,8 @@ namespace CarAndAll.Server.Models
         [Required]
         public int Aanschafjaar { get; set; }
 
-        public List<Verhuuraanvraag> Verhuuraanvragen { get; set; }
+        public List<Verhuuraanvraag>? Verhuuraanvragen { get; set; }
 
-        public List<Schademelding> Schademeldingen { get; set; }
+        public List<Schademelding>? Schademeldingen { get; set; }
     }
 }
