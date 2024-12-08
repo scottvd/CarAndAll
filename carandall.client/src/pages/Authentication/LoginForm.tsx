@@ -1,7 +1,6 @@
 import {
   Anchor,
   Button,
-  Checkbox,
   Container,
   Paper,
   PasswordInput,
@@ -14,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
 import { AxiosError } from 'axios';
 import { api } from '../../main';
-import { useForm, isEmail, isNotEmpty, matchesField } from '@mantine/form';
+import { useForm, isEmail } from '@mantine/form';
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -43,19 +42,19 @@ export function LoginForm() {
     }).
       then((v) => {
         console.log(v);
-        // notifications.show({
-        //   title: "Account aangemaakt.",
-        //   message: "U kunt nu inloggen. U wordt nu doorgeleid..."
-        // });
+        notifications.show({
+          title: "Ingelogd",
+          message: " U wordt nu doorgeleid naar het dashboard."
+        });
 
-        // setTimeout(() => {
-        //   navigate('/login');
-        // }, 1500)
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500)
       })
       .catch((err: AxiosError) => {
         console.log(err.response);
-
-        if (err.response.status == 401) {
+        
+        if (err.response?.status == 401) {
           notifications.show({
             color: 'red',
             title: 'Ongeldige inloggegevens.',
@@ -84,9 +83,9 @@ export function LoginForm() {
           </Title>
 
           <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <TextInput label="Email address" placeholder="hello@gmail.com" size="md"  {...form.getInputProps("email")} />
-            <PasswordInput label="Password" placeholder="Your password" mt="md" size="md"  {...form.getInputProps("password")} />
-            <Checkbox label="Keep me logged in" mt="xl" size="md" />
+            <TextInput label="Email address" placeholder="admin@carandall.nl" size="md"  {...form.getInputProps("email")} />
+            <PasswordInput label="Wachtwoord" placeholder="Uw wachtwoord" mt="md" size="md"  {...form.getInputProps("password")} />
+            {/* <Checkbox label="Keep me logged in" mt="xl" size="md" /> */}
             <Button type="submit" fullWidth mt="xl" size="md">
               Login
             </Button>

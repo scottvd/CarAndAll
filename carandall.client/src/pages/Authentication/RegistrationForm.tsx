@@ -76,10 +76,10 @@ export function RegistrationForm() {
           navigate('/login');
         }, 1500)
       })
-      .catch((err: AxiosError) => {
+      .catch((err: any) => {
         console.log(err.response);
 
-        if (err.response.data[0].code == "DuplicateUserName") {
+        if (err.response.data.code == "DuplicateUserName") { // @t
           notifications.show({
             color: 'red',
             title: 'E-mail al in gebruik.',

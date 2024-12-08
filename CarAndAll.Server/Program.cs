@@ -39,10 +39,12 @@ namespace CarAndAll.Server
 
             builder.Services.AddEndpointsApiExplorer();
 
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-            });
+            builder.Services.AddSwaggerGen(
+            //    c =>
+            //{
+            //    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+            //}
+            );
 
             builder
                 .Services.AddIdentityApiEndpoints<Gebruiker>()

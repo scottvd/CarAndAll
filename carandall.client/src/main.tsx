@@ -40,16 +40,10 @@ const router = createBrowserRouter([
     {
         path: '/register',
         element: <RegistrationForm />,
-        // children: [
-        //     { path: 'abonnement', element: <Aanvragen /> },
-        // ]
     },
     {
         path: '/login',
         element: <LoginForm />,
-        // children: [
-        //     { path: 'abonnement', element: <Aanvragen /> },
-        // ]
     },
     
     {
