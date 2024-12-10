@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import Landing from './pages/Landing.tsx';
 import { Footer } from './components/Footer/Footer.tsx';
@@ -12,6 +12,9 @@ import { Dashboard } from './pages/Dashboard/Dashboard.tsx';
 import { Aanvragen } from './pages/Abonnement/Aanvragen.tsx';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
+import { Voertuigen } from './pages/Voertuigen/Voertuigen.tsx';
+import { Voertuig } from './pages/Voertuigen/Voertuig.tsx';
+import { Toevoegen } from './pages/Voertuigen/Toevoegen.tsx';
 
 /*
 Router creeert de manier om met de SPA door de verschillende paginas te gaan.
@@ -26,6 +29,15 @@ const router = createBrowserRouter([
         element: <Dashboard />,
         children: [
             { path: 'abonnement', element: <Aanvragen /> },
+            { 
+                path: 'voertuigen', 
+                element: <Outlet />,
+                children: [
+                    { index: true, element: <Voertuigen />},
+                    { path: 'voertuig', element: <Voertuig />},
+                    { path: 'toevoegen', element: <Toevoegen />}
+                ]
+            },
         ]
     },
     {

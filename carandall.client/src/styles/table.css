@@ -1,0 +1,8 @@
+.basistabel th, td {
+ text-align: left;
+ padding: 0.2em;
+}
+
+.button {
+    border: none;
+}

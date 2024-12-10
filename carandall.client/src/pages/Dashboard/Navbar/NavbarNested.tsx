@@ -1,6 +1,7 @@
 import {
   IconAdjustments,
   IconCalendarStats,
+  IconCar,
   IconFileAnalytics,
   IconGauge,
   IconLock,
@@ -40,12 +41,10 @@ const mockdata = [
     ],
   },
   {
-    label: 'Releases',
-    icon: IconCalendarStats,
+    label: 'Voertuigen',
+    icon: IconCar,
     links: [
-      { label: 'Upcoming releases', link: '/' },
-      { label: 'Previous releases', link: '/' },
-      { label: 'Releases schedule', link: '/' },
+      { label: 'Voertuigen bekijken', link: '/dashboard/voertuigen' }
     ],
   },
   { label: 'Analytics', icon: IconPresentationAnalytics },

@@ -19,7 +19,14 @@ namespace CarAndAll.Server
             builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
             builder.Services.AddDbContext<CarAndAllContext>();
 
+            builder.Services.AddCors(o => {
+                o.AddPolicy("AllowSpecificOrigin", 
+                p => p.WithOrigins("https://localhost:60281").AllowCredentials().AllowAnyHeader().AllowAnyMethod());
+            });
+
             var app = builder.Build();
+
+            app.UseCors("AllowSpecificOrigin");
 
             // Configure the HTTP request pipeline
             app.UseRouting();
