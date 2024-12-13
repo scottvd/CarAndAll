@@ -17,12 +17,14 @@ namespace CarAndAll.Server.Migrations
                 name: "Abonnementen",
                 columns: table => new
                 {
-                    Type = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
                     Prijs = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Abonnementen", x => x.Type);
+                    table.PrimaryKey("PK_Abonnementen", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -37,6 +39,31 @@ namespace CarAndAll.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Gebruikers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
+                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Gebruikers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,10 +84,10 @@ namespace CarAndAll.Server.Migrations
                 {
                     VoertuigID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Kenteken = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Soort = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Merk = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Type = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Kenteken = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
+                    Soort = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Merk = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Type = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     Aanschafjaar = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -76,16 +103,17 @@ namespace CarAndAll.Server.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Naam = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Adres = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    AbonnementType = table.Column<string>(type: "TEXT", nullable: true)
+                    AbonnementId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Bedrijven", x => x.KvkNummer);
                     table.ForeignKey(
-                        name: "FK_Bedrijven_Abonnementen_AbonnementType",
-                        column: x => x.AbonnementType,
+                        name: "FK_Bedrijven_Abonnementen_AbonnementId",
+                        column: x => x.AbonnementId,
                         principalTable: "Abonnementen",
-                        principalColumn: "Type");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,46 +138,6 @@ namespace CarAndAll.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Naam = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Adres = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
-                    BedrijfKvkNummer = table.Column<int>(type: "INTEGER", nullable: true),
-                    AbonnementType = table.Column<string>(type: "TEXT", nullable: true),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Abonnementen_AbonnementType",
-                        column: x => x.AbonnementType,
-                        principalTable: "Abonnementen",
-                        principalColumn: "Type");
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Bedrijven_BedrijfKvkNummer",
-                        column: x => x.BedrijfKvkNummer,
-                        principalTable: "Bedrijven",
-                        principalColumn: "KvkNummer");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -163,9 +151,9 @@ namespace CarAndAll.Server.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        name: "FK_AspNetUserClaims_Gebruikers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Gebruikers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -183,9 +171,9 @@ namespace CarAndAll.Server.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
                     table.ForeignKey(
-                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        name: "FK_AspNetUserLogins_Gebruikers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Gebruikers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -207,9 +195,9 @@ namespace CarAndAll.Server.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        name: "FK_AspNetUserRoles_Gebruikers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Gebruikers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -227,9 +215,35 @@ namespace CarAndAll.Server.Migrations
                 {
                     table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
                     table.ForeignKey(
-                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        name: "FK_AspNetUserTokens_Gebruikers_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Gebruikers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Klanten",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Naam = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Adres = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    BedrijfId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Klanten", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Klanten_Bedrijven_BedrijfId",
+                        column: x => x.BedrijfId,
+                        principalTable: "Bedrijven",
+                        principalColumn: "KvkNummer");
+                    table.ForeignKey(
+                        name: "FK_Klanten_Gebruikers_Id",
+                        column: x => x.Id,
+                        principalTable: "Gebruikers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -242,22 +256,22 @@ namespace CarAndAll.Server.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     StartDatum = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EindDatum = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", maxLength: 50, nullable: false),
                     KlantId = table.Column<string>(type: "TEXT", nullable: false),
-                    VoertuigID = table.Column<int>(type: "INTEGER", nullable: false)
+                    VoertuigId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Verhuuraanvragen", x => x.AanvraagID);
                     table.ForeignKey(
-                        name: "FK_Verhuuraanvragen_AspNetUsers_KlantId",
+                        name: "FK_Verhuuraanvragen_Klanten_KlantId",
                         column: x => x.KlantId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Klanten",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Verhuuraanvragen_Voertuigen_VoertuigID",
-                        column: x => x.VoertuigID,
+                        name: "FK_Verhuuraanvragen_Voertuigen_VoertuigId",
+                        column: x => x.VoertuigId,
                         principalTable: "Voertuigen",
                         principalColumn: "VoertuigID",
                         onDelete: ReferentialAction.Cascade);
@@ -269,31 +283,31 @@ namespace CarAndAll.Server.Migrations
                 {
                     SchademeldingID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Status = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", maxLength: 50, nullable: false),
                     Datum = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Beschrijving = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    VoertuigID = table.Column<int>(type: "INTEGER", nullable: false),
-                    VerhuuraanvraagAanvraagID = table.Column<int>(type: "INTEGER", nullable: false),
-                    MedewerkerPersoneelsNummer = table.Column<int>(type: "INTEGER", nullable: false)
+                    Beschrijving = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    VoertuigId = table.Column<int>(type: "INTEGER", nullable: false),
+                    VerhuuraanvraagId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MedewerkerId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Schademeldingen", x => x.SchademeldingID);
                     table.ForeignKey(
-                        name: "FK_Schademeldingen_Medewerkers_MedewerkerPersoneelsNummer",
-                        column: x => x.MedewerkerPersoneelsNummer,
+                        name: "FK_Schademeldingen_Medewerkers_MedewerkerId",
+                        column: x => x.MedewerkerId,
                         principalTable: "Medewerkers",
                         principalColumn: "PersoneelsNummer",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Schademeldingen_Verhuuraanvragen_VerhuuraanvraagAanvraagID",
-                        column: x => x.VerhuuraanvraagAanvraagID,
+                        name: "FK_Schademeldingen_Verhuuraanvragen_VerhuuraanvraagId",
+                        column: x => x.VerhuuraanvraagId,
                         principalTable: "Verhuuraanvragen",
                         principalColumn: "AanvraagID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Schademeldingen_Voertuigen_VoertuigID",
-                        column: x => x.VoertuigID,
+                        name: "FK_Schademeldingen_Voertuigen_VoertuigId",
+                        column: x => x.VoertuigId,
                         principalTable: "Voertuigen",
                         principalColumn: "VoertuigID",
                         onDelete: ReferentialAction.Cascade);
@@ -332,22 +346,23 @@ namespace CarAndAll.Server.Migrations
                 {
                     NotitieID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Inhoud = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    SchademeldingID = table.Column<int>(type: "INTEGER", nullable: false),
-                    MedewerkerPersoneelsNummer = table.Column<int>(type: "INTEGER", nullable: false)
+                    Inhoud = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
+                    Datum = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    SchademeldingId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MedewerkerId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notities", x => x.NotitieID);
                     table.ForeignKey(
-                        name: "FK_Notities_Medewerkers_MedewerkerPersoneelsNummer",
-                        column: x => x.MedewerkerPersoneelsNummer,
+                        name: "FK_Notities_Medewerkers_MedewerkerId",
+                        column: x => x.MedewerkerId,
                         principalTable: "Medewerkers",
                         principalColumn: "PersoneelsNummer",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Notities_Schademeldingen_SchademeldingID",
-                        column: x => x.SchademeldingID,
+                        name: "FK_Notities_Schademeldingen_SchademeldingId",
+                        column: x => x.SchademeldingId,
                         principalTable: "Schademeldingen",
                         principalColumn: "SchademeldingID",
                         onDelete: ReferentialAction.Cascade);
@@ -544,30 +559,9 @@ namespace CarAndAll.Server.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "EmailIndex",
-                table: "AspNetUsers",
-                column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_AbonnementType",
-                table: "AspNetUsers",
-                column: "AbonnementType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_BedrijfKvkNummer",
-                table: "AspNetUsers",
-                column: "BedrijfKvkNummer");
-
-            migrationBuilder.CreateIndex(
-                name: "UserNameIndex",
-                table: "AspNetUsers",
-                column: "NormalizedUserName",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Bedrijven_AbonnementType",
+                name: "IX_Bedrijven_AbonnementId",
                 table: "Bedrijven",
-                column: "AbonnementType");
+                column: "AbonnementId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Fotos_MedewerkerPersoneelsNummer",
@@ -580,35 +574,51 @@ namespace CarAndAll.Server.Migrations
                 column: "SchademeldingID");
 
             migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "Gebruikers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "Gebruikers",
+                column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Klanten_BedrijfId",
+                table: "Klanten",
+                column: "BedrijfId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Medewerkers_PersoneelsNummer",
                 table: "Medewerkers",
                 column: "PersoneelsNummer",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notities_MedewerkerPersoneelsNummer",
+                name: "IX_Notities_MedewerkerId",
                 table: "Notities",
-                column: "MedewerkerPersoneelsNummer");
+                column: "MedewerkerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Notities_SchademeldingID",
+                name: "IX_Notities_SchademeldingId",
                 table: "Notities",
-                column: "SchademeldingID");
+                column: "SchademeldingId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Schademeldingen_MedewerkerPersoneelsNummer",
+                name: "IX_Schademeldingen_MedewerkerId",
                 table: "Schademeldingen",
-                column: "MedewerkerPersoneelsNummer");
+                column: "MedewerkerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Schademeldingen_VerhuuraanvraagAanvraagID",
+                name: "IX_Schademeldingen_VerhuuraanvraagId",
                 table: "Schademeldingen",
-                column: "VerhuuraanvraagAanvraagID");
+                column: "VerhuuraanvraagId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Schademeldingen_VoertuigID",
+                name: "IX_Schademeldingen_VoertuigId",
                 table: "Schademeldingen",
-                column: "VoertuigID");
+                column: "VoertuigId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Verhuuraanvragen_KlantId",
@@ -616,9 +626,9 @@ namespace CarAndAll.Server.Migrations
                 column: "KlantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Verhuuraanvragen_VoertuigID",
+                name: "IX_Verhuuraanvragen_VoertuigId",
                 table: "Verhuuraanvragen",
-                column: "VoertuigID");
+                column: "VoertuigId");
         }
 
         /// <inheritdoc />
@@ -658,13 +668,16 @@ namespace CarAndAll.Server.Migrations
                 name: "Verhuuraanvragen");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Klanten");
 
             migrationBuilder.DropTable(
                 name: "Voertuigen");
 
             migrationBuilder.DropTable(
                 name: "Bedrijven");
+
+            migrationBuilder.DropTable(
+                name: "Gebruikers");
 
             migrationBuilder.DropTable(
                 name: "Abonnementen");

@@ -6,24 +6,24 @@ namespace CarAndAll.Server.Models
     public class Voertuig {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int VoertuigID { get; set; }
-        
-        [Required, MaxLength(255)]
+
+        [Required, MaxLength(10)]
         public string Kenteken { get; set; }
 
-        [Required, MaxLength(255)]
-        public string Soort { get; set; }
+        [Required, MaxLength(50)]
+        public string Soort { get; set; } // Bijv. "Auto", "Busje", etc.
 
-        [Required, MaxLength(255)]
+        [Required, MaxLength(50)]
         public string Merk { get; set; }
 
-        [Required, MaxLength(255)]
+        [Required, MaxLength(50)]
         public string Type { get; set; }
 
         [Required]
+        [Range(1900, int.MaxValue, ErrorMessage = "Ongeldig aanschafjaar.")]
         public int Aanschafjaar { get; set; }
 
-        public List<Verhuuraanvraag> Verhuuraanvragen { get; set; }
-
-        public List<Schademelding> Schademeldingen { get; set; }
+        public List<Verhuuraanvraag>? Verhuuraanvragen { get; set; }
+        public List<Schademelding>? Schademeldingen { get; set; }
     }
 }

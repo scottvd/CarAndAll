@@ -1,21 +1,24 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CarAndAll.Server.Models;
+using System.ComponentModel.DataAnnotations;
 
-namespace CarAndAll.Server.DTOs
+public class RegisterDto
 {
-    public class RegisterDto
-    {
-        [Required, MaxLength(255), EmailAddress]
-        public string Email { get; set; }
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; }
 
-        [Required]
-        public string Password { get; set; }
+    [Required]
+    [MinLength(6)]
+    public string Password { get; set; }
 
-        [Required, MaxLength(255)]
-        public string Naam { get; set; }
+    [Required]
+    public string Naam { get; set; }
 
-        [Required, MaxLength(255)]
-        public string Adres { get; set; }
+    [Required]
+    public string Adres { get; set; }
 
-    }
+    [Required]
+    public KlantType Type { get; set; } // Het type klant: Particulier of Zakelijk
 
+    public int? BedrijfId { get; set; } // Alleen voor zakelijke klanten
 }

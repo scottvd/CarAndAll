@@ -11,10 +11,13 @@ namespace CarAndAll.Server.Models
         public string Naam { get; set; }
 
         [Required, MaxLength(255)]
-        public string Adres { get; set; } 
+        public string Adres { get; set; }
 
         [Required]
-        public List<Klant> Klanten { get; set; } 
-        public Abonnement? Abonnement { get; set; }     
+        public List<Klant> Klanten { get; set; }
+
+        [Required]
+        public int AbonnementId { get; set; }
+        public Abonnement Abonnement { get; set; }
     }
 }

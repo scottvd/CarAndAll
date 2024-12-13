@@ -7,29 +7,30 @@ namespace CarAndAll.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AbbonementController : ControllerBase
+    public class AbonnementController : ControllerBase
     {
 
         private readonly CarAndAllContext _context;
 
 
 
-        public AbbonementController(CarAndAllContext context)
+        public AbonnementController(CarAndAllContext context)
         {
             _context = context;
         }
 
 
-        // GET: api/Abonnement
-        [HttpGet]
+        [HttpGet("Abonnement")]
         public async Task<ActionResult<IEnumerable<Abonnement>>> GetAbonnementen()
         {
             return await _context.Abonnementen.ToListAsync();
         }
 
-
-        //// GET: api/Abonnement/5
-        //[HttpGet("{id}")]
-
+        //// GET: Abonnement/actief
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Abonnement>>> GetActieveAbonnementen()
+        //{
+        //    return await _context.Abonnementen.ToListAsync();
+        //}
     }
 }

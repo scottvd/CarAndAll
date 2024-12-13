@@ -20,17 +20,18 @@ namespace CarAndAll.Server
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin",
-            builder =>
-            {
-                builder.WithOrigins("https://localhost:60281")
-                       .AllowCredentials()
-                       .AllowAnyHeader()
-                       .AllowAnyMethod();
+                options.AddPolicy(
+                    "AllowSpecificOrigin",
+                    builder =>
+                    {
+                        builder
+                            .WithOrigins("https://localhost:60281")
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    }
+                );
             });
-            });
-
-            
 
             // Register other services, e.g., controllers, etc.
             builder.Services.AddAuthorization();
@@ -66,28 +67,50 @@ namespace CarAndAll.Server
             app.MapControllers();
             app.MapIdentityApi<Gebruiker>();
             //app.MapCustomIdentityEndpoints();
-            app.MapPost(
-                "/register_dto",
-                async (RegisterDto model, UserManager<Gebruiker> userManager) =>
-                {
-                    var user = new Gebruiker
-                    {
-                        UserName = model.Email,
-                        Naam = model.Naam,
-                        Adres = model.Adres,
-                        Email = model.Email,
-                    };
-                    Console.WriteLine("model: {}");
-                    var result = await userManager.CreateAsync(user, model.Password);
+            //app.MapPost(
+            //    "/register_dto",
+            //    async (
+            //        RegisterDto model,
+            //        UserManager<Gebruiker> userManager,
+            //        CarAndAllContext dbContext
+            //    ) =>
+            //    {
+            //        // Maak de gebruiker aan als een Klant
+            //        var klant = new Klant
+            //        {
+            //            UserName = model.Email,
+            //            Naam = model.Naam,
+            //            Adres = model.Adres,
+            //            Email = model.Email,
+            //            Type = model.Type, // Het type klant (Particulier of Zakelijk)
+            //        };
 
-                    if (result.Succeeded)
-                    {
-                        return Results.Ok("User registered successfully");
-                    }
+            //        // Als het een zakelijke klant is, koppel het bedrijf
+            //        if (model.Type == KlantType.ZakelijkeBeheerder && model.BedrijfId.HasValue)
+            //        {
+            //            var bedrijf = await dbContext.Bedrijven.FindAsync(model.BedrijfId.Value);
+            //            if (bedrijf == null)
+            //            {
+            //                return Results.BadRequest("Bedrijf niet gevonden.");
+            //            }
 
-                    return Results.BadRequest(result.Errors);
-                }
-            );
+            //            klant.Bedrijf = bedrijf;
+            //        }
+
+            //        // Probeer de gebruiker aan te maken in Identity
+            //        var result = await userManager.CreateAsync(klant, model.Password);
+
+            //        if (result.Succeeded)
+            //        {
+            //            // Registratie is succesvol
+            //            return Results.Ok("Klant succesvol geregistreerd.");
+            //        }
+
+            //        // Fout bij registratie
+            //        return Results.BadRequest(result.Errors);
+            //    }
+            //);
+
             app.Run();
         }
     }

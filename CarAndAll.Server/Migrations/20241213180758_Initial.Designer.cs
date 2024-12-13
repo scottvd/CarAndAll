@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarAndAll.Server.Migrations
 {
     [DbContext(typeof(CarAndAllContext))]
-    [Migration("20241205154323_Initial")]
+    [Migration("20241213180758_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -22,13 +22,17 @@ namespace CarAndAll.Server.Migrations
 
             modelBuilder.Entity("CarAndAll.Server.Models.Abonnement", b =>
                 {
-                    b.Property<string>("Type")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Prijs")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Type");
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Abonnementen");
                 });
@@ -39,8 +43,8 @@ namespace CarAndAll.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("AbonnementType")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("AbonnementId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Adres")
                         .IsRequired()
@@ -54,7 +58,7 @@ namespace CarAndAll.Server.Migrations
 
                     b.HasKey("KvkNummer");
 
-                    b.HasIndex("AbonnementType");
+                    b.HasIndex("AbonnementId");
 
                     b.ToTable("Bedrijven");
                 });
@@ -93,18 +97,8 @@ namespace CarAndAll.Server.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Adres")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -119,11 +113,6 @@ namespace CarAndAll.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Naam")
-                        .IsRequired()
-                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
@@ -162,11 +151,9 @@ namespace CarAndAll.Server.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("Gebruikers", (string)null);
 
-                    b.HasDiscriminator().HasValue("Gebruiker");
-
-                    b.UseTphMappingStrategy();
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("CarAndAll.Server.Models.Medewerker", b =>
@@ -189,22 +176,25 @@ namespace CarAndAll.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Inhoud")
-                        .IsRequired()
-                        .HasMaxLength(255)
+                    b.Property<DateTime>("Datum")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("MedewerkerPersoneelsNummer")
+                    b.Property<string>("Inhoud")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MedewerkerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SchademeldingID")
+                    b.Property<int>("SchademeldingId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("NotitieID");
 
-                    b.HasIndex("MedewerkerPersoneelsNummer");
+                    b.HasIndex("MedewerkerId");
 
-                    b.HasIndex("SchademeldingID");
+                    b.HasIndex("SchademeldingId");
 
                     b.ToTable("Notities");
                 });
@@ -217,33 +207,32 @@ namespace CarAndAll.Server.Migrations
 
                     b.Property<string>("Beschrijving")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Datum")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("MedewerkerPersoneelsNummer")
+                    b.Property<int>("MedewerkerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("VerhuuraanvraagAanvraagID")
+                    b.Property<int>("Status")
+                        .HasMaxLength(50)
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("VoertuigID")
+                    b.Property<int>("VerhuuraanvraagId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("VoertuigId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("SchademeldingID");
 
-                    b.HasIndex("MedewerkerPersoneelsNummer");
+                    b.HasIndex("MedewerkerId");
 
-                    b.HasIndex("VerhuuraanvraagAanvraagID");
+                    b.HasIndex("VerhuuraanvraagId");
 
-                    b.HasIndex("VoertuigID");
+                    b.HasIndex("VoertuigId");
 
                     b.ToTable("Schademeldingen");
                 });
@@ -264,19 +253,18 @@ namespace CarAndAll.Server.Migrations
                     b.Property<DateTime>("StartDatum")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("INTEGER");
 
-                    b.Property<int>("VoertuigID")
+                    b.Property<int>("VoertuigId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("AanvraagID");
 
                     b.HasIndex("KlantId");
 
-                    b.HasIndex("VoertuigID");
+                    b.HasIndex("VoertuigId");
 
                     b.ToTable("Verhuuraanvragen");
                 });
@@ -292,22 +280,22 @@ namespace CarAndAll.Server.Migrations
 
                     b.Property<string>("Kenteken")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Merk")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Soort")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasMaxLength(255)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("VoertuigID");
@@ -1862,24 +1850,34 @@ namespace CarAndAll.Server.Migrations
                 {
                     b.HasBaseType("CarAndAll.Server.Models.Gebruiker");
 
-                    b.Property<string>("AbonnementType")
+                    b.Property<string>("Adres")
+                        .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("BedrijfKvkNummer")
+                    b.Property<int?>("BedrijfId")
                         .HasColumnType("INTEGER");
 
-                    b.HasIndex("AbonnementType");
+                    b.Property<string>("Naam")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
 
-                    b.HasIndex("BedrijfKvkNummer");
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
 
-                    b.HasDiscriminator().HasValue("Klant");
+                    b.HasIndex("BedrijfId");
+
+                    b.ToTable("Klanten", (string)null);
                 });
 
             modelBuilder.Entity("CarAndAll.Server.Models.Bedrijf", b =>
                 {
                     b.HasOne("CarAndAll.Server.Models.Abonnement", "Abonnement")
                         .WithMany()
-                        .HasForeignKey("AbonnementType");
+                        .HasForeignKey("AbonnementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Abonnement");
                 });
@@ -1907,13 +1905,13 @@ namespace CarAndAll.Server.Migrations
                 {
                     b.HasOne("CarAndAll.Server.Models.Medewerker", "Medewerker")
                         .WithMany("Notities")
-                        .HasForeignKey("MedewerkerPersoneelsNummer")
+                        .HasForeignKey("MedewerkerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarAndAll.Server.Models.Schademelding", "Schademelding")
                         .WithMany("Notities")
-                        .HasForeignKey("SchademeldingID")
+                        .HasForeignKey("SchademeldingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1926,19 +1924,19 @@ namespace CarAndAll.Server.Migrations
                 {
                     b.HasOne("CarAndAll.Server.Models.Medewerker", "Medewerker")
                         .WithMany("Schademeldingen")
-                        .HasForeignKey("MedewerkerPersoneelsNummer")
+                        .HasForeignKey("MedewerkerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarAndAll.Server.Models.Verhuuraanvraag", "Verhuuraanvraag")
                         .WithMany("Schademeldingen")
-                        .HasForeignKey("VerhuuraanvraagAanvraagID")
+                        .HasForeignKey("VerhuuraanvraagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CarAndAll.Server.Models.Voertuig", "Voertuig")
                         .WithMany("Schademeldingen")
-                        .HasForeignKey("VoertuigID")
+                        .HasForeignKey("VoertuigId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1959,7 +1957,7 @@ namespace CarAndAll.Server.Migrations
 
                     b.HasOne("CarAndAll.Server.Models.Voertuig", "Voertuig")
                         .WithMany("Verhuuraanvragen")
-                        .HasForeignKey("VoertuigID")
+                        .HasForeignKey("VoertuigId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -2021,20 +2019,17 @@ namespace CarAndAll.Server.Migrations
 
             modelBuilder.Entity("CarAndAll.Server.Models.Klant", b =>
                 {
-                    b.HasOne("CarAndAll.Server.Models.Abonnement", null)
-                        .WithMany("Klanten")
-                        .HasForeignKey("AbonnementType");
-
                     b.HasOne("CarAndAll.Server.Models.Bedrijf", "Bedrijf")
                         .WithMany("Klanten")
-                        .HasForeignKey("BedrijfKvkNummer");
+                        .HasForeignKey("BedrijfId");
+
+                    b.HasOne("CarAndAll.Server.Models.Gebruiker", null)
+                        .WithOne()
+                        .HasForeignKey("CarAndAll.Server.Models.Klant", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Bedrijf");
-                });
-
-            modelBuilder.Entity("CarAndAll.Server.Models.Abonnement", b =>
-                {
-                    b.Navigation("Klanten");
                 });
 
             modelBuilder.Entity("CarAndAll.Server.Models.Bedrijf", b =>
