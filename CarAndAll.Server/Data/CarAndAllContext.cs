@@ -14,6 +14,37 @@ namespace CarAndAll.Server.Data
             modelBuilder.Entity<Medewerker>().HasKey(m => m.PersoneelsNummer);
             modelBuilder.Entity<Medewerker>().HasIndex(m => m.PersoneelsNummer).IsUnique();
 
+
+            // Configureer TPT inheritance: Klant heeft een aparte tabel
+            modelBuilder.Entity<Klant>()
+                .ToTable("Klanten");  // Dit zorgt ervoor dat Klant zijn eigen tabel heeft
+            modelBuilder.Entity<Gebruiker>()
+                .ToTable("Gebruikers");  // Dit zorgt ervoor dat Gebruiker zijn eigen tabel heeft
+
+   
+
+            // Relatie tussen Klant en Verhuuraanvraag (één klant kan meerdere verhuuraanvragen hebben)
+            modelBuilder.Entity<Verhuuraanvraag>()
+                .HasOne(v => v.Klant)  // Verhuuraanvraag heeft één Klant
+                .WithMany(k => k.Verhuuraanvraagen) // Klant heeft veel verhuuraanvragen
+                .HasForeignKey(v => v.KlantId); // Verhuuraanvraag verwijst naar Klant via KlantId
+
+            // Relatie tussen Verhuuraanvraag en Voertuig (één verhuuraanvraag kan één voertuig betreffen)
+            modelBuilder.Entity<Verhuuraanvraag>()
+                .HasOne(v => v.Voertuig)  // Verhuuraanvraag heeft één Voertuig
+                .WithMany(v => v.Verhuuraanvragen) // Voertuig heeft veel verhuuraanvragen
+                .HasForeignKey(v => v.VoertuigId); // Verhuuraanvraag verwijst naar Voertuig via VoertuigId
+
+            // Relatie tussen Voertuig en Schademelding (één voertuig kan meerdere schademeldingen hebben)
+            modelBuilder.Entity<Voertuig>()
+                .HasMany(v => v.Schademeldingen)  // Voertuig heeft veel schademeldingen
+                .WithOne(s => s.Voertuig)  // Schademelding heeft één Voertuig
+                .HasForeignKey(s => s.VoertuigId); // Schademelding verwijst naar Voertuig via VoertuigId
+
+
+
+
+
             //Seed voertuigen
             List<Voertuig> data;
             data = new List<Voertuig>{
@@ -177,7 +208,8 @@ namespace CarAndAll.Server.Data
             };
 
             int i = -1;
-            foreach(var item in data) {
+            foreach (var item in data)
+            {
                 item.VoertuigID = i--;
             }
 
@@ -193,7 +225,7 @@ namespace CarAndAll.Server.Data
         public DbSet<Klant> Klanten { get; set; }
         public DbSet<Medewerker> Medewerkers { get; set; }
         public DbSet<Notitie> Notities { get; set; }
-        public DbSet<Schademelding> Schademeldingen { get; set; }   
+        public DbSet<Schademelding> Schademeldingen { get; set; }
         public DbSet<Verhuuraanvraag> Verhuuraanvragen { get; set; }
         public DbSet<Voertuig> Voertuigen { get; set; }
     }

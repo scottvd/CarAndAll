@@ -22,6 +22,7 @@ export function Aanvragen() {
         message: 'Aanvraag voltooid. U krijgt een notificatie/e-mail wanneer deze aanvraag is goedgekeurd.',
         autoClose: 5000,
       });
+
     },
   });
 

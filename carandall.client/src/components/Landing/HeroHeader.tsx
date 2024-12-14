@@ -11,7 +11,7 @@ export function HeroHeader() {
 
             <div className={classes.inner}>
                 <Title className={classes.title}>
-                    Ontdek de vrijheid met{' '}
+                    Ontdek de vrijheid met {' '}
                     <Text component="span" className={classes.highlight} inherit>
                         CarAndAll
                     </Text>
@@ -26,13 +26,18 @@ export function HeroHeader() {
 
                 <div className={classes.controls}>
                     <Button className={classes.control} size="lg" variant="default" color="gray" onClick={(e) => {
-                        navigate("/dashboard");
+                        navigate("/register");
                         e.preventDefault();
                     }}>
                         Registreren
                     </Button>
-                    <Button className={classes.control} size="lg">
-                        Account aanmaken
+                    <Button 
+                    onClick={(e) => {
+                        navigate("/login");
+                        e.preventDefault();
+                    }}
+                    className={classes.control} size="lg">
+                        Inloggen
                     </Button>
                     
                 </div>
