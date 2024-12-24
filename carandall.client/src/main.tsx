@@ -17,6 +17,7 @@ import { Toevoegen } from './pages/Voertuigen/Toevoegen.tsx';
 import {  RegistrationForm } from './pages/Authentication/RegistrationForm.tsx';
 import axios, {  } from 'axios';
 import { LoginForm } from './pages/Authentication/LoginForm.tsx';
+import { Overzicht } from './pages/Huren/Overzicht.tsx';
 
 
 export const api = axios.create({
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
                     { path: 'toevoegen', element: <Toevoegen />}
                 ]
             },
+            { path: 'huren', element: <Overzicht />}
         ]
     },
     {
