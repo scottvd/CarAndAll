@@ -6,7 +6,11 @@ namespace CarAndAll.Server.Data
 {
     public class CarAndAllContext : IdentityDbContext<Gebruiker>
     {
-        protected override void OnConfiguring(DbContextOptionsBuilder b) => b.UseSqlite("Data Source=database.db");
+        public CarAndAllContext(DbContextOptions<CarAndAllContext> options)
+        : base(options)
+        {
+        }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

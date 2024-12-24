@@ -16,7 +16,10 @@ namespace CarAndAll.Server
             // Create and configure the WebApplication
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<CarAndAllContext>();
+            var connectionString = builder.Configuration.GetConnectionString("CarAndAllDbConnection") ?? throw new InvalidOperationException();
+            builder.Services.AddDbContext<CarAndAllContext>(options =>
+                options.UseSqlite(connectionString)
+            );
 
             builder.Services.AddCors(options =>
             {
@@ -33,20 +36,13 @@ namespace CarAndAll.Server
                 );
             });
 
-            // Register other services, e.g., controllers, etc.
             builder.Services.AddAuthorization();
 
             builder.Services.AddControllers();
-            //builder.Services.AddAuthentication().AddCookie(IdentityConstants.ApplicationScheme);
 
             builder.Services.AddEndpointsApiExplorer();
 
-            builder.Services.AddSwaggerGen(
-            //    c =>
-            //{
-            //    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-            //}
-            );
+            builder.Services.AddSwaggerGen();
 
             builder
                 .Services.AddIdentityApiEndpoints<Gebruiker>()
@@ -67,50 +63,6 @@ namespace CarAndAll.Server
             app.UseAuthorization();
             app.MapControllers();
             app.MapIdentityApi<Gebruiker>();
-            //app.MapCustomIdentityEndpoints();
-            //app.MapPost(
-            //    "/register_dto",
-            //    async (
-            //        RegisterDto model,
-            //        UserManager<Gebruiker> userManager,
-            //        CarAndAllContext dbContext
-            //    ) =>
-            //    {
-            //        // Maak de gebruiker aan als een Klant
-            //        var klant = new Klant
-            //        {
-            //            UserName = model.Email,
-            //            Naam = model.Naam,
-            //            Adres = model.Adres,
-            //            Email = model.Email,
-            //            Type = model.Type, // Het type klant (Particulier of Zakelijk)
-            //        };
-
-            //        // Als het een zakelijke klant is, koppel het bedrijf
-            //        if (model.Type == KlantType.ZakelijkeBeheerder && model.BedrijfId.HasValue)
-            //        {
-            //            var bedrijf = await dbContext.Bedrijven.FindAsync(model.BedrijfId.Value);
-            //            if (bedrijf == null)
-            //            {
-            //                return Results.BadRequest("Bedrijf niet gevonden.");
-            //            }
-
-            //            klant.Bedrijf = bedrijf;
-            //        }
-
-            //        // Probeer de gebruiker aan te maken in Identity
-            //        var result = await userManager.CreateAsync(klant, model.Password);
-
-            //        if (result.Succeeded)
-            //        {
-            //            // Registratie is succesvol
-            //            return Results.Ok("Klant succesvol geregistreerd.");
-            //        }
-
-            //        // Fout bij registratie
-            //        return Results.BadRequest(result.Errors);
-            //    }
-            //);
 
             app.Run();
         }
