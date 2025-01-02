@@ -18,6 +18,9 @@ import {  RegistrationForm } from './pages/Authentication/RegistrationForm.tsx';
 import axios, {  } from 'axios';
 import { LoginForm } from './pages/Authentication/LoginForm.tsx';
 import { Overzicht } from './pages/Huren/Overzicht.tsx';
+import { Test } from './pages/Test/Test.tsx';
+import { Login } from './pages/Authenticatie/Login.tsx';
+import { Register } from './pages/Authenticatie/Register.tsx';
 
 
 export const api = axios.create({
@@ -53,13 +56,16 @@ const router = createBrowserRouter([
     },
     {
         path: '/register',
-        element: <RegistrationForm />,
+        element: <Register />,
     },
     {
         path: '/login',
-        element: <LoginForm />,
+        element: <Login />,
     },
-    
+    {
+        path: '/test',
+        element: <Test />
+    },
     {
         path: '*',
         element: <NotFound />,

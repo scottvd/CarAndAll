@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CarAndAll.Server.Data;
 using CarAndAll.Server.DTOs;
 using CarAndAll.Server.Models;
@@ -63,6 +64,15 @@ namespace CarAndAll.Server
             app.UseAuthorization();
             app.MapControllers();
             app.MapIdentityApi<Gebruiker>();
+            app.MapPost("/logout", async (SignInManager<Gebruiker> signInManager) => {
+                await signInManager.SignOutAsync();
+                return Results.Ok();
+            }).RequireAuthorization();
+
+            app.MapPost("/pingauth", (ClaimsPrincipal gebruiker) => {
+                var email = gebruiker.FindFirstValue(ClaimTypes.Email);
+                return Results.Json(new { Email = email}); ;
+            }).RequireAuthorization();
 
             app.Run();
         }
