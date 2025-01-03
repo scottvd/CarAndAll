@@ -14,10 +14,9 @@ namespace CarAndAll.Server.Models
         public string Adres { get; set; }
 
         [Required]
-        public List<Klant> Klanten { get; set; }
+        public List<Huurder> Huurders { get; set; }
 
-        [Required]
-        public int AbonnementId { get; set; }
-        public Abonnement Abonnement { get; set; }
+        public int? AbonnementId { get; set; }
+        public Abonnement? Abonnement { get; set; }
     }
 }

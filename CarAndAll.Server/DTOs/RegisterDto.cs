@@ -18,7 +18,7 @@ public class RegisterDto
     public string Adres { get; set; }
 
     [Required]
-    public KlantType Type { get; set; } // Het type klant: Particulier of Zakelijk
+    public HuurderType Type { get; set; }
 
     public int? BedrijfId { get; set; } // Alleen voor zakelijke klanten
 }

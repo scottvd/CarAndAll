@@ -18,20 +18,22 @@ namespace CarAndAll.Server.Data
             modelBuilder.Entity<Medewerker>().HasKey(m => m.PersoneelsNummer);
             modelBuilder.Entity<Medewerker>().HasIndex(m => m.PersoneelsNummer).IsUnique();
 
-
-            // Configureer TPT inheritance: Klant heeft een aparte tabel
-            modelBuilder.Entity<Klant>()
-                .ToTable("Klanten");  // Dit zorgt ervoor dat Klant zijn eigen tabel heeft
+            // Configureer TPT inheritance: Huurder heeft een aparte tabel
+            modelBuilder.Entity<Huurder>()
+                .ToTable("Huurders");  // Dit zorgt ervoor dat Huurder zijn eigen tabel heeft
             modelBuilder.Entity<Gebruiker>()
                 .ToTable("Gebruikers");  // Dit zorgt ervoor dat Gebruiker zijn eigen tabel heeft
 
-   
+            modelBuilder.Entity<Huurder>()
+                .HasOne(h => h.Bedrijf)
+                .WithMany(b => b.Huurders)
+                .HasForeignKey(h => h.BedrijfId);
 
-            // Relatie tussen Klant en Verhuuraanvraag (één klant kan meerdere verhuuraanvragen hebben)
+            // Relatie tussen Huurder en Verhuuraanvraag (één klant kan meerdere verhuuraanvragen hebben)
             modelBuilder.Entity<Verhuuraanvraag>()
-                .HasOne(v => v.Klant)  // Verhuuraanvraag heeft één Klant
-                .WithMany(k => k.Verhuuraanvraagen) // Klant heeft veel verhuuraanvragen
-                .HasForeignKey(v => v.KlantId); // Verhuuraanvraag verwijst naar Klant via KlantId
+                .HasOne(v => v.Huurder)  // Verhuuraanvraag heeft één Huurder
+                .WithMany(k => k.Verhuuraanvraagen) // Huurder heeft veel verhuuraanvragen
+                .HasForeignKey(v => v.HuurderId); // Verhuuraanvraag verwijst naar Huurder via KlantId
 
             // Relatie tussen Verhuuraanvraag en Voertuig (één verhuuraanvraag kan één voertuig betreffen)
             modelBuilder.Entity<Verhuuraanvraag>()
@@ -44,10 +46,6 @@ namespace CarAndAll.Server.Data
                 .HasMany(v => v.Schademeldingen)  // Voertuig heeft veel schademeldingen
                 .WithOne(s => s.Voertuig)  // Schademelding heeft één Voertuig
                 .HasForeignKey(s => s.VoertuigId); // Schademelding verwijst naar Voertuig via VoertuigId
-
-
-
-
 
             //Seed voertuigen
             List<Voertuig> data;
@@ -226,7 +224,7 @@ namespace CarAndAll.Server.Data
         public DbSet<Abonnement> Abonnementen { get; set; }
         public DbSet<Bedrijf> Bedrijven { get; set; }
         public DbSet<Foto> Fotos { get; set; }
-        public DbSet<Klant> Klanten { get; set; }
+        public DbSet<Huurder> Huurders { get; set; }
         public DbSet<Medewerker> Medewerkers { get; set; }
         public DbSet<Notitie> Notities { get; set; }
         public DbSet<Schademelding> Schademeldingen { get; set; }

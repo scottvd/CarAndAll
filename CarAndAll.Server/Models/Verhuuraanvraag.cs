@@ -23,8 +23,8 @@ namespace CarAndAll.Server.Models
         public VerhuurStatus Status { get; set; }
 
         [Required]
-        public string KlantId { get; set; }
-        public Klant Klant { get; set; }
+        public string HuurderId { get; set; }
+        public Huurder Huurder { get; set; }
 
         [Required]
         public int VoertuigId { get; set; }
