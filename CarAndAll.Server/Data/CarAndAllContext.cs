@@ -1,4 +1,5 @@
 using CarAndAll.Server.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,36 +19,42 @@ namespace CarAndAll.Server.Data
             modelBuilder.Entity<Medewerker>().HasKey(m => m.PersoneelsNummer);
             modelBuilder.Entity<Medewerker>().HasIndex(m => m.PersoneelsNummer).IsUnique();
 
-            // Configureer TPT inheritance: Huurder heeft een aparte tabel
             modelBuilder.Entity<Huurder>()
-                .ToTable("Huurders");  // Dit zorgt ervoor dat Huurder zijn eigen tabel heeft
+                .ToTable("Huurders"); 
             modelBuilder.Entity<Gebruiker>()
-                .ToTable("Gebruikers");  // Dit zorgt ervoor dat Gebruiker zijn eigen tabel heeft
+                .ToTable("Gebruikers");
 
             modelBuilder.Entity<Huurder>()
                 .HasOne(h => h.Bedrijf)
                 .WithMany(b => b.Huurders)
                 .HasForeignKey(h => h.BedrijfId);
 
-            // Relatie tussen Huurder en Verhuuraanvraag (één klant kan meerdere verhuuraanvragen hebben)
             modelBuilder.Entity<Verhuuraanvraag>()
-                .HasOne(v => v.Huurder)  // Verhuuraanvraag heeft één Huurder
-                .WithMany(k => k.Verhuuraanvraagen) // Huurder heeft veel verhuuraanvragen
-                .HasForeignKey(v => v.HuurderId); // Verhuuraanvraag verwijst naar Huurder via KlantId
+                .HasOne(v => v.Huurder)
+                .WithMany(k => k.Verhuuraanvraagen)
+                .HasForeignKey(v => v.HuurderId);
 
-            // Relatie tussen Verhuuraanvraag en Voertuig (één verhuuraanvraag kan één voertuig betreffen)
             modelBuilder.Entity<Verhuuraanvraag>()
-                .HasOne(v => v.Voertuig)  // Verhuuraanvraag heeft één Voertuig
-                .WithMany(v => v.Verhuuraanvragen) // Voertuig heeft veel verhuuraanvragen
-                .HasForeignKey(v => v.VoertuigId); // Verhuuraanvraag verwijst naar Voertuig via VoertuigId
+                .HasOne(v => v.Voertuig)
+                .WithMany(v => v.Verhuuraanvragen)
+                .HasForeignKey(v => v.VoertuigId);
 
-            // Relatie tussen Voertuig en Schademelding (één voertuig kan meerdere schademeldingen hebben)
             modelBuilder.Entity<Voertuig>()
-                .HasMany(v => v.Schademeldingen)  // Voertuig heeft veel schademeldingen
-                .WithOne(s => s.Voertuig)  // Schademelding heeft één Voertuig
-                .HasForeignKey(s => s.VoertuigId); // Schademelding verwijst naar Voertuig via VoertuigId
+                .HasMany(v => v.Schademeldingen)
+                .WithOne(s => s.Voertuig)
+                .HasForeignKey(s => s.VoertuigId);
 
-            //Seed voertuigen
+            var roles = new List<IdentityRole>
+            {
+                new IdentityRole { Id = "1", Name = "Particulier", NormalizedName = "PARTICULIER" },
+                new IdentityRole { Id = "2", Name = "Zakelijk", NormalizedName = "ZAKELIJK" },
+                new IdentityRole { Id = "3", Name = "Wagenparkbeheerder", NormalizedName = "WAGENPARKBEHEERDER" },
+                new IdentityRole { Id = "4", Name = "BackofficeMedewerker", NormalizedName = "BACKOFFICEMEDEWERKER" },
+                new IdentityRole { Id = "5", Name = "FrontofficeMedewerker", NormalizedName = "FRONTOFFICEMEDEWERKER" }
+            };
+
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
+                
             List<Voertuig> data;
             data = new List<Voertuig>{
                 new Voertuig { Kenteken = "AB-123-CD", Soort = "auto", Merk = "Toyota", Type = "Corolla", Aanschafjaar = 2018 },

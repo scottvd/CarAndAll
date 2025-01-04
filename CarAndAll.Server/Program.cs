@@ -45,9 +45,10 @@ namespace CarAndAll.Server
 
             builder.Services.AddSwaggerGen();
 
-            builder
-                .Services.AddIdentityApiEndpoints<Gebruiker>()
-                .AddEntityFrameworkStores<CarAndAllContext>();
+            builder.Services.AddIdentity<Gebruiker, IdentityRole>()
+                .AddEntityFrameworkStores<CarAndAllContext>()
+                .AddDefaultTokenProviders();
+
 
             var app = builder.Build();
 
@@ -63,16 +64,6 @@ namespace CarAndAll.Server
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapIdentityApi<Gebruiker>();
-            app.MapPost("/logout", async (SignInManager<Gebruiker> signInManager) => {
-                await signInManager.SignOutAsync();
-                return Results.Ok();
-            }).RequireAuthorization();
-
-            app.MapPost("/pingauth", (ClaimsPrincipal gebruiker) => {
-                var email = gebruiker.FindFirstValue(ClaimTypes.Email);
-                return Results.Json(new { Email = email}); ;
-            }).RequireAuthorization();
 
             app.Run();
         }
