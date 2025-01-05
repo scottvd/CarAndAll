@@ -43,9 +43,13 @@ public class RegistreerController : ControllerBase
                 var errors = result.Errors.Select(e => e.Description).ToList();
                 return BadRequest(new { Errors = errors });
             }
+            
+            await _userManager.AddToRoleAsync(nieuweHuurder, "Particulier");
 
             if (dto.Zakelijk)
             {
+                await _userManager.AddToRoleAsync(nieuweHuurder, "Wagenparkbeheerder");
+
                 var nieuwBedrijf = new Bedrijf
                 {
                     KvkNummer = dto.Kvk.Value,
