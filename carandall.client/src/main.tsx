@@ -14,11 +14,8 @@ import { Notifications } from '@mantine/notifications';
 import { Voertuigen } from './pages/Voertuigen/Voertuigen.tsx';
 import { Voertuig } from './pages/Voertuigen/Voertuig.tsx';
 import { Toevoegen } from './pages/Voertuigen/Toevoegen.tsx';
-import {  RegistrationForm } from './pages/Authentication/RegistrationForm.tsx';
 import axios, {  } from 'axios';
-import { LoginForm } from './pages/Authentication/LoginForm.tsx';
 import { Overzicht } from './pages/Huren/Overzicht.tsx';
-import { Test } from './pages/Test/Test.tsx';
 import { Login } from './pages/Authenticatie/Login.tsx';
 import { Register } from './pages/Authenticatie/Register.tsx';
 
@@ -61,10 +58,6 @@ const router = createBrowserRouter([
     {
         path: '/login',
         element: <Login />,
-    },
-    {
-        path: '/test',
-        element: <Test />
     },
     {
         path: '*',
