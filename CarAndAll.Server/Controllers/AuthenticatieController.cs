@@ -24,6 +24,7 @@
         }
 
         [HttpPost("LogIn")]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> LogIn([FromBody] LogInDTO dto)
         {
             if (!ModelState.IsValid)
@@ -49,11 +50,30 @@
             {
                 return Unauthorized(new { Message = "Gebruiker heeft geen rollen" });
             }
-
+            
+            var csrfToken = Guid.NewGuid().ToString();
             var token = GenerateJwtToken(gebruiker, rollen);
 
-            return Ok(new { Token = token, Message = "Inloggen geslaagd!" });
+            Response.Cookies.Append("csrfToken", csrfToken, new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(6)
+            });
+
+            Response.Cookies.Append("jwtToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(6)
+            });
+
+            return Ok(new { Message = "Inloggen geslaagd!" });
         }
+
+
 
         private string GenerateJwtToken(Gebruiker gebruiker, IList<string> rollen)
         {

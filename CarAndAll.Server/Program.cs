@@ -15,7 +15,6 @@ namespace CarAndAll.Server
     {
         public static void Main(string[] args)
         {
-            // Create and configure the WebApplication
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration.GetConnectionString("CarAndAllDbConnection") ?? throw new InvalidOperationException();
@@ -55,7 +54,20 @@ namespace CarAndAll.Server
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
                             System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                        )
+                        ),
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var token = context.Request.Cookies["jwtToken"];
+                            if (!string.IsNullOrEmpty(token))
+                            {
+                                context.Token = token;
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -71,6 +83,10 @@ namespace CarAndAll.Server
                 .AddEntityFrameworkStores<CarAndAllContext>()
                 .AddDefaultTokenProviders();
 
+            builder.Services.AddAntiforgery(options =>
+            {
+                options.HeaderName = "X-CSRF-Token";
+            });
 
             var app = builder.Build();
 

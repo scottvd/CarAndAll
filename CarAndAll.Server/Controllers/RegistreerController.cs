@@ -17,6 +17,7 @@ public class RegistreerController : ControllerBase
     }
 
     [HttpPost("RegistreerGebruiker")]
+    [IgnoreAntiforgeryToken]
     public async Task<IActionResult> Register([FromBody] RegistreerDTO dto)
     {
         if (!ModelState.IsValid)

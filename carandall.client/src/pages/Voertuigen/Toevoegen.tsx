@@ -1,4 +1,5 @@
 import React from "react";
+import { fetchCsrf } from "../../utilities/fetchCsrf";
 
 export function Toevoegen() {
     const voertuigToevoegen = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -14,11 +15,12 @@ export function Toevoegen() {
         };
 
         try {
-            const resultaat = await fetch("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
+            const resultaat = await fetchCsrf("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
+                credentials: "include",
                 body: JSON.stringify(voertuigData)
             });
             if (resultaat.ok) {

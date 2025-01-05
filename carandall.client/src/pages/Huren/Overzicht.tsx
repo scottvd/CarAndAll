@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { DateInput } from "@mantine/dates";
 import { Button, Group, Table } from "@mantine/core";
 import '@mantine/dates/styles.css';
+import { fetchCsrf } from "../../utilities/fetchCsrf";
 
 type Voertuig = {
   voertuigID: number;
@@ -27,12 +28,11 @@ export function Overzicht() {
             inleverDatum: inleverDatum.toISOString(),
           });
 
-          const resultaat = await fetch(`http://localhost:5202/api/Huur/GetVoertuigen?${parameters}`, {
+          const resultaat = await fetchCsrf(`http://localhost:5202/api/Huur/GetVoertuigen?${parameters}`, {
             method: "GET",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/json"
             },
-            credentials: "include",
           });
       
           if (!resultaat.ok) {

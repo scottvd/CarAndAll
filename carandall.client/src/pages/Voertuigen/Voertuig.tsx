@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { fetchCsrf } from "../../utilities/fetchCsrf";
 
 export function Voertuig() {
     const location = useLocation();
@@ -16,7 +17,7 @@ export function Voertuig() {
 
     const verwijderVoertuig = async () => {
         try {
-            const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/DeleteVoertuig/${voertuig.voertuigID}`, { 
+            const resultaat = await fetchCsrf(`http://localhost:5202/api/VoertuigBeheer/DeleteVoertuig/${voertuig.voertuigID}`, { 
                 method: 'DELETE',
                 credentials: 'include' 
             });
@@ -35,7 +36,7 @@ export function Voertuig() {
         try {
             const voertuigGegevens = { ...editedVoertuig, voertuigID: voertuig.voertuigID };
 
-            const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/EditVoertuig/${voertuig.voertuigID}`, {
+            const resultaat = await fetchCsrf(`http://localhost:5202/api/VoertuigBeheer/EditVoertuig/${voertuig.voertuigID}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
