@@ -12,9 +12,6 @@ namespace CarAndAll.Server.Models
     public class Huurder : Gebruiker
     {
         [Required, MaxLength(255)]
-        public string Naam { get; set; }
-
-        [Required, MaxLength(255)]
         public string Adres { get; set; }
 
         [Required]

@@ -31,7 +31,7 @@ namespace CarAndAll.Server.Models
         public Verhuuraanvraag Verhuuraanvraag { get; set; }
 
         [Required]
-        public int MedewerkerId { get; set; }
+        public string MedewerkerId { get; set; }
         public Medewerker Medewerker { get; set; }
 
         public List<Notitie>? Notities { get; set; }

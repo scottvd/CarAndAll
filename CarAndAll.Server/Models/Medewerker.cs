@@ -2,9 +2,8 @@
 
     namespace CarAndAll.Server.Models
     {
-        public class Medewerker
+        public class Medewerker : Gebruiker
         {
-            [Key]
             public int PersoneelsNummer { get; set; }
 
             public List<Schademelding>? Schademeldingen { get; set; }

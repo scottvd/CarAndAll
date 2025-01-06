@@ -82,6 +82,16 @@ namespace CarAndAll.Server
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            using(var scope = app.Services.CreateScope()) {
+                var services = scope.ServiceProvider;
+
+                var context = services.GetRequiredService<CarAndAllContext>();
+                context.Database.Migrate();
+                var userManager = services.GetRequiredService<UserManager<Gebruiker>>();
+                var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                
+                await DbSeeding.SeedDatabase(context, userManager, roleManager);
+            }
 
             app.Run();
         }

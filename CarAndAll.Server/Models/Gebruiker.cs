@@ -5,6 +5,7 @@ namespace CarAndAll.Server.Models
 {
     public class Gebruiker : IdentityUser
     {
-    
+        [Required, MaxLength(255)]
+        public string Naam { get; set; }
     }
 }   

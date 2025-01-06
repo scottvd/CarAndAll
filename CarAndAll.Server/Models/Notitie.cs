@@ -18,7 +18,7 @@ namespace CarAndAll.Server.Models
         public Schademelding Schademelding { get; set; }
 
         [Required]
-        public int MedewerkerId { get; set; } // Foreign key naar Medewerker
+        public string MedewerkerId { get; set; } // Foreign key naar Medewerker
         public Medewerker Medewerker { get; set; }
     }
 }
