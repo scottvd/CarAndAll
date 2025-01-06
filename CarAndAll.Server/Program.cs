@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System.IO;
 using CarAndAll.Server.Data;
 using CarAndAll.Server.DTOs;
 using CarAndAll.Server.Models;
@@ -6,14 +7,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarAndAll.Server
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -37,41 +37,21 @@ namespace CarAndAll.Server
                 );
             });
 
-            builder.Services.AddAuthentication(options =>
-                {
-                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                })
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                        ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(
-                            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                        ),
-                    };
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            var token = context.Request.Cookies["jwtToken"];
-                            if (!string.IsNullOrEmpty(token))
-                            {
-                                context.Token = token;
-                            }
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Huurders", policy =>
+                    policy.Requirements.Add(new RolRequirement(new[] { "Particulier", "Zakelijk", "Wagenparkbeheerder" })));
+                options.AddPolicy("Wagenparkbeheerder", policy =>
+                    policy.Requirements.Add(new RolRequirement(new[] { "Wagenparkbeheerder" })));
+                options.AddPolicy("Medewerkers", policy =>
+                    policy.Requirements.Add(new RolRequirement(new[] { "FrontofficeMedewerker", "BackofficeMedewerker" })));
+                options.AddPolicy("BackofficeMedewerker", policy =>
+                    policy.Requirements.Add(new RolRequirement(new[] { "BackofficeMedewerker" })));
+            });
 
-            builder.Services.AddAuthorization();
+            builder.Services.AddSingleton<IAuthorizationHandler, JwtAuthorizationHandler>();
 
             builder.Services.AddControllers();
 

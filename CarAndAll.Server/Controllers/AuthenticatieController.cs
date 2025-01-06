@@ -50,7 +50,7 @@
             {
                 return Unauthorized(new { Message = "Gebruiker heeft geen rollen" });
             }
-            
+
             var csrfToken = Guid.NewGuid().ToString();
             var token = GenerateJwtToken(gebruiker, rollen);
 
@@ -72,8 +72,6 @@
 
             return Ok(new { Message = "Inloggen geslaagd!" });
         }
-
-
 
         private string GenerateJwtToken(Gebruiker gebruiker, IList<string> rollen)
         {

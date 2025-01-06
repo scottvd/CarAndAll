@@ -38,7 +38,6 @@ namespace CarAndAll.Server.Controllers
         }
 
         [HttpPost("AddVoertuig")]
-        [Authorize(Roles = "Particulier,Zakelijk,Wagenparkbeheerder")]
         public async Task<IActionResult> AddVoertuig([FromBody] Voertuig voertuig)
         {
             if (voertuig == null)
