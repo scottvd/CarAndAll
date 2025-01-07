@@ -1,4 +1,4 @@
-﻿import { HeroHeader } from '../components/Landing/HeroHeader';
+﻿import { HeroHeader } from '../../components/Landing/HeroHeader';
 
 function Landing() {
     return (
