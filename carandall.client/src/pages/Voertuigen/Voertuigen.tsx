@@ -30,7 +30,6 @@ export function Voertuigen() {
         }
 
         const data = await resultaat.json();
-        console.log(data);
         setData(data);
       } catch (error) {
         console.error(error);

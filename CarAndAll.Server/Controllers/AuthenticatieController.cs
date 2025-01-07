@@ -15,12 +15,15 @@
         private readonly SignInManager<Gebruiker> _signInManager;
         private readonly UserManager<Gebruiker> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthenticatieController(SignInManager<Gebruiker> signInManager, UserManager<Gebruiker> userManager, IConfiguration configuration)
+
+        public AuthenticatieController(SignInManager<Gebruiker> signInManager, UserManager<Gebruiker> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("LogIn")]
@@ -72,6 +75,40 @@
 
             return Ok(new { Message = "Inloggen geslaagd!" });
         }
+
+        [HttpPost("HeeftToestemming")]
+        public bool HeeftToestemming([FromBody] string[] rollen)
+        {
+            var token = _httpContextAccessor.HttpContext.Request.Cookies["jwtToken"];
+            
+            if (!string.IsNullOrEmpty(token))
+            {
+                try
+                {
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadJwtToken(token);
+                    
+                    var rolClaims = jwtToken.Claims
+                                            .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
+                                            .Select(c => c.Value)
+                                            .ToList();
+                    
+                    if (rolClaims != null && rolClaims.Any())
+                    {
+                        var heeftToestemming = rollen.Any(rol => rolClaims.Contains(rol, StringComparer.OrdinalIgnoreCase));
+                        
+                        return heeftToestemming;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+            
+            return false;
+        }
+
 
         private string GenerateJwtToken(Gebruiker gebruiker, IList<string> rollen)
         {

@@ -29,17 +29,14 @@ public class JwtAuthorizationHandler : AuthorizationHandler<RolRequirement>
         {
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
-            
             var rolClaims = jwtToken?.Claims.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value).ToList();
-            Console.WriteLine("Roles in token: " + string.Join(", ", rolClaims)); 
 
-            if (rolClaims != null && rolClaims.Any(role => requirement.Rollen.Contains(role)))
+            if (rolClaims != null && rolClaims.Any(rol => requirement.Rollen.Contains(rol)))
             {
                 context.Succeed(requirement);
             }
             else
             {
-                Console.WriteLine("User does not have any of the required roles.");
                 context.Fail();
             }
         }

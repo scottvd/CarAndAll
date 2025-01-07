@@ -75,8 +75,8 @@ createRoot(document.getElementById("root")!).render(
     <StrictMode>
         <MantineProvider>
             <ModalsProvider>
-            <Notifications />
-            <RouterProvider router={router} />
+                <Notifications />
+                <RouterProvider router={router} />
             </ModalsProvider>
         </MantineProvider>
     </StrictMode>

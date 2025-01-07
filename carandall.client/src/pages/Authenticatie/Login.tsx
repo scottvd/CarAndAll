@@ -19,6 +19,17 @@ export function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        const rollen = ["FrontofficeMedewerker"];
+
+            await fetch("http://localhost:5202/api/Authenticatie/HeeftToestemming", {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify(rollen)
+            });
+
         if (!form.isValid()) {
             setError("Please fix the errors in the form.");
             return;
