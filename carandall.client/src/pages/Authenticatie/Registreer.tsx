@@ -76,7 +76,7 @@ export function Register() {
                 requestBody.BedrijfAdres = form.values.bedrijfAdres;
             }
 
-            const resultaat = await fetch("http://localhost:5202/api/Registreer/RegistreerGebruiker", {
+            const resultaat = await fetch("http://localhost:5202/api/Registratie/Registreer", {
                 method: "POST",
                 credentials: "include",
                 headers: {

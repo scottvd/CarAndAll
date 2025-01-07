@@ -5,20 +5,20 @@ using Microsoft.AspNetCore.Identity;
 
 [ApiController]
 [Route("api/[controller]")]
-public class RegistreerController : ControllerBase
+public class RegistratieController : ControllerBase
 {
     private readonly UserManager<Gebruiker> _userManager;
     private readonly CarAndAllContext _context;
 
-    public RegistreerController(UserManager<Gebruiker> userManager, CarAndAllContext context)
+    public RegistratieController(UserManager<Gebruiker> userManager, CarAndAllContext context)
     {
         _userManager = userManager;
         _context = context;
     }
 
-    [HttpPost("RegistreerGebruiker")]
+    [HttpPost("Registreer")]
     [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> Register([FromBody] RegistreerDTO dto)
+    public async Task<IActionResult> Registreer([FromBody] RegistreerDTO dto)
     {
         if (!ModelState.IsValid)
         {

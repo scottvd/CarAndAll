@@ -17,7 +17,7 @@ import { Toevoegen } from './pages/Voertuigen/Toevoegen.tsx';
 import axios, {  } from 'axios';
 import { Overzicht } from './pages/Huren/Overzicht.tsx';
 import { Login } from './pages/Authenticatie/Login.tsx';
-import { Register } from './pages/Authenticatie/Register.tsx';
+import { Register } from './pages/Authenticatie/Registreer.tsx';
 
 
 export const api = axios.create({

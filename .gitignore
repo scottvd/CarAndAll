@@ -490,3 +490,8 @@ CarAndAll.Server/Migrations/20241224140131_init.Designer.cs
 CarAndAll.Server/database.db
 CarAndAll.Server/Migrations/20241213180758_Initial.cs
 CarAndAll.Server/Migrations/20241213180758_Initial.Designer.cs
+CarAndAll.Server/database.db-shm
+CarAndAll.Server/database.db-wal
+CarAndAll.Server/Migrations/20250107145800_Init.cs
+CarAndAll.Server/Migrations/20250107145800_Init.Designer.cs
+CarAndAll.Server/Migrations/CarAndAllContextModelSnapshot.cs
