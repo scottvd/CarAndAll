@@ -77,12 +77,16 @@
         }
 
         [HttpPost("HeeftToestemming")]
-        public bool HeeftToestemming([FromBody] string[] rollen)
+        public bool HeeftToestemming([FromBody] string[]? rollen)
         {
             var token = _httpContextAccessor.HttpContext.Request.Cookies["jwtToken"];
             
             if (!string.IsNullOrEmpty(token))
             {
+                if(rollen == null || !rollen.Any()) {
+                    return true;
+                }
+                
                 try
                 {
                     var handler = new JwtSecurityTokenHandler();

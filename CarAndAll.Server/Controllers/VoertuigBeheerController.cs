@@ -37,7 +37,9 @@ namespace CarAndAll.Server.Controllers
             return Ok(voertuig);
         }
 
+
         [HttpPost("AddVoertuig")]
+        [Authorize(Policy = "Medewerkers")]
         public async Task<IActionResult> AddVoertuig([FromBody] Voertuig voertuig)
         {
             if (voertuig == null)
@@ -51,6 +53,7 @@ namespace CarAndAll.Server.Controllers
         }
 
         [HttpPut("EditVoertuig/{id}")]
+        [Authorize(Policy = "Medewerkers")]
         public async Task<IActionResult> EditVoertuig(int Id, [FromBody] Voertuig bewerkingen)
         {
             if (bewerkingen == null || Id != bewerkingen.VoertuigID)
@@ -100,6 +103,7 @@ namespace CarAndAll.Server.Controllers
         }
 
         [HttpDelete("DeleteVoertuig/{id}")]
+        [Authorize(Policy = "Medewerkers")]
         public async Task<IActionResult> DeleteVoertuig(int Id)
         {
             var voertuig = await _context.Voertuigen.FindAsync(Id);

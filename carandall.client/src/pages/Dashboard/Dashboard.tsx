@@ -2,8 +2,11 @@ import { AppShell, Burger, Group, Skeleton } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { NavbarNested } from './Navbar/NavbarNested';
 import { Outlet } from 'react-router-dom';
+import { useAuthorisatie } from '../../utilities/useAuthorisatie';
 
 export function Dashboard() {
+  useAuthorisatie(null);
+
   const [opened, { toggle }] = useDisclosure();
 
   return (

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 
 export function Voertuig() {
+    useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
+       
     const location = useLocation();
     const { voertuig } = location.state || {};
 

@@ -1,7 +1,10 @@
 import React from "react";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 
 export function Toevoegen() {
+    useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
+    
     const voertuigToevoegen = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 

@@ -3,6 +3,7 @@ import { Table, Button, TextInput, Group } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import '../../styles/table.css';
 import { IconSearch } from "@tabler/icons-react";
+import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 
 type Voertuig = {
   voertuigID: number;
@@ -16,6 +17,8 @@ type Voertuig = {
 };
 
 export function Voertuigen() {
+  useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
+
   const [data, setData] = useState<Voertuig[] | null>(null);
   const navigate = useNavigate(); 
   const [zoekwaarde, setZoekwaarde] = useState('');
