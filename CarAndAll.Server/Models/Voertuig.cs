@@ -11,7 +11,7 @@ namespace CarAndAll.Server.Models
         public string Kenteken { get; set; }
 
         [Required, MaxLength(50)]
-        public string Soort { get; set; } // Bijv. "Auto", "Busje", etc.
+        public string Soort { get; set; }
 
         [Required, MaxLength(50)]
         public string Merk { get; set; }
@@ -22,6 +22,9 @@ namespace CarAndAll.Server.Models
         [Required]
         [Range(1900, int.MaxValue, ErrorMessage = "Ongeldig aanschafjaar.")]
         public int Aanschafjaar { get; set; }
+
+        [Required]
+        public decimal Prijs { get; set; }
 
         public List<Verhuuraanvraag>? Verhuuraanvragen { get; set; }
 
