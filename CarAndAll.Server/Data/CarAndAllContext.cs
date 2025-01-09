@@ -31,7 +31,8 @@ namespace CarAndAll.Server.Data
             modelBuilder.Entity<Verhuuraanvraag>()
                 .HasOne(v => v.Huurder)
                 .WithMany(k => k.Verhuuraanvraagen)
-                .HasForeignKey(v => v.HuurderId);
+                .HasForeignKey(v => v.HuurderId)
+                .HasPrincipalKey(h => h.Id);
 
             modelBuilder.Entity<Verhuuraanvraag>()
                 .HasOne(v => v.Voertuig)

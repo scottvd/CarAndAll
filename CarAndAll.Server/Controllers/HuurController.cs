@@ -31,7 +31,7 @@ namespace CarAndAll.Server.Controllers
             
             var resultaat = await _context.Voertuigen
                 .Where(voertuig =>
-                    voertuig.Verhuuraanvragen == null ||
+                    voertuig.Verhuuraanvragen.Any() ||
                     !voertuig.Verhuuraanvragen.Any(v =>
                         (ophaalDatum >= v.OphaalDatum && ophaalDatum <= v.InleverDatum) ||
                         (inleverDatum >= v.OphaalDatum && inleverDatum <= v.InleverDatum) ||
@@ -45,46 +45,67 @@ namespace CarAndAll.Server.Controllers
 
         [HttpPost("DoeVerhuuraanvraag")]
         [Authorize(Policy = "Huurders")]
-        public async Task<IActionResult> DoeVerhuuraanvraag([FromBody] Voertuig voertuig, [FromBody] DateTime ophaalDatum, [FromBody] DateTime inleverDatum) {
-            if(voertuig == null || ophaalDatum == DateTime.MinValue || inleverDatum == DateTime.MinValue) {
+        public async Task<IActionResult> DoeVerhuuraanvraag([FromBody] VerhuuraanvraagDTO verhuuraanvraagDTO) 
+        {
+            if(verhuuraanvraagDTO.OphaalDatum == DateTime.MinValue || verhuuraanvraagDTO.InleverDatum == DateTime.MinValue) 
+            {
                 return BadRequest("Er is iets fout gegaan tijdens het maken van uw verhuuraanvraag. Probeer het opnieuw!");
             }
             
-            var gewensteVoertuig = _context.Voertuigen.FirstOrDefault(v => v.VoertuigID.Equals(voertuig.VoertuigID));
+            var gewensteVoertuig = await _context.Voertuigen.FirstOrDefaultAsync(v => v.VoertuigID == verhuuraanvraagDTO.VoertuigId);
             
-            if(gewensteVoertuig == null) {
+            if(gewensteVoertuig == null) 
+            {
                 return NotFound("Voertuig niet gevonden");
             }
 
-            var isBeschikbaar = await _context.Verhuuraanvragen
-            .Where(a => a.VoertuigId == voertuig.VoertuigID && 
-                        ((a.OphaalDatum >= ophaalDatum && a.OphaalDatum <= inleverDatum) ||
-                        (a.InleverDatum >= ophaalDatum && a.InleverDatum <= inleverDatum) ||
-                        (a.OphaalDatum <= ophaalDatum && a.InleverDatum >= inleverDatum)))
-            .AnyAsync();
+            var isGehuurd = await _context.Verhuuraanvragen
+                .AnyAsync(a => a.VoertuigId == verhuuraanvraagDTO.VoertuigId &&
+                    a.Status != AanvraagStatus.Geaccepteerd &&
+                    (
+                        (a.OphaalDatum >= verhuuraanvraagDTO.OphaalDatum && a.OphaalDatum <= verhuuraanvraagDTO.InleverDatum) ||
+                        (a.InleverDatum >= verhuuraanvraagDTO.OphaalDatum && a.InleverDatum <= verhuuraanvraagDTO.InleverDatum) ||
+                        (a.OphaalDatum <= verhuuraanvraagDTO.OphaalDatum && a.InleverDatum >= verhuuraanvraagDTO.InleverDatum)
+                    ));
 
-            if(!isBeschikbaar) {
+            if(isGehuurd) 
+            {
                 return Conflict("Er bestaat al een verhuuraanvraag voor het geselecteerde voertuig binnen de gewenste periode");
             }
 
             var token = _httpContextAccessor.HttpContext.Request.Cookies["jwtToken"];
             var handler = new JwtSecurityTokenHandler();
             var jwtToken = handler.ReadJwtToken(token);
-            var gebruikerId = jwtToken?.Claims.FirstOrDefault(c => c.Type == "Sub")?.Value;
+            var gebruikerId = jwtToken?.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
 
-            if(gebruikerId == null) {
+            if(gebruikerId == null || !await _context.Huurders.AnyAsync(g => g.Id == gebruikerId)) 
+            {
                 return Unauthorized("Er is geen ingelogde gebruiker gevonden, log in en probeer het opnieuw");
             }
 
-            var Verhuuraanvraag = new Verhuuraanvraag {
-                OphaalDatum = ophaalDatum,
-                InleverDatum = inleverDatum,
+            Console.WriteLine("HuurderId:" + gebruikerId + " VoertuigId: " + verhuuraanvraagDTO.VoertuigId);
+
+            var verhuuraanvraag = new Verhuuraanvraag 
+            {
+                OphaalDatum = verhuuraanvraagDTO.OphaalDatum,
+                InleverDatum = verhuuraanvraagDTO.InleverDatum,
                 Status = AanvraagStatus.InBehandeling,
                 HuurderId = gebruikerId,
                 VoertuigId = gewensteVoertuig.VoertuigID
             };
 
-            return Ok();
+            try
+            {
+                _context.Verhuuraanvragen.Add(verhuuraanvraag);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                Console.WriteLine($"Error saving verhuuraanvraag: {ex.Message}");
+                return StatusCode(500, "Er is een probleem opgetreden bij het verwerken van uw aanvraag. Probeer het later opnieuw.");
+            }
+
+            return Ok("Verhuuraanvraag succesvol ingediend!");
         }
     }
 }
