@@ -11,7 +11,6 @@ public class RegistreerDTO
     [Required]
     public string Naam { get; set; }
 
-    [Required]
     public string Adres { get; set; }
 
     public bool Zakelijk { get; set; }

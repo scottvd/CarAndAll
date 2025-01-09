@@ -1,4 +1,4 @@
-import { AppShell, Burger, Group, Skeleton } from '@mantine/core';
+import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { NavbarNested } from './Navbar/NavbarNested';
 import { Outlet } from 'react-router-dom';
@@ -18,7 +18,6 @@ export function Dashboard() {
       <AppShell.Header>
         <Group h="100%" px="md">
           <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          {/* <MantineLogo size={30} /> */}
         </Group>
       </AppShell.Header>
       <AppShell.Navbar>

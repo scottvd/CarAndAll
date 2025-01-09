@@ -495,3 +495,4 @@ CarAndAll.Server/database.db-wal
 CarAndAll.Server/Migrations/20250107145800_Init.cs
 CarAndAll.Server/Migrations/20250107145800_Init.Designer.cs
 CarAndAll.Server/Migrations/CarAndAllContextModelSnapshot.cs
+/CarAndAll.Server/Migrations

@@ -11,7 +11,7 @@ namespace CarAndAll.Server.Models
 
     public class Huurder : Gebruiker
     {
-        [Required, MaxLength(255)]
+        [MaxLength(255)]
         public string Adres { get; set; }
 
         [Required]
