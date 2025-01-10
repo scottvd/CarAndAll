@@ -61,7 +61,7 @@ namespace CarAndAll.Server.Controllers
 
             var isGehuurd = await _context.Verhuuraanvragen
                 .AnyAsync(a => a.VoertuigId == verhuuraanvraagDTO.VoertuigId &&
-                    a.Status != AanvraagStatus.Geaccepteerd &&
+                    a.Status == AanvraagStatus.Geaccepteerd &&
                     (
                         (a.OphaalDatum >= verhuuraanvraagDTO.OphaalDatum && a.OphaalDatum <= verhuuraanvraagDTO.InleverDatum) ||
                         (a.InleverDatum >= verhuuraanvraagDTO.OphaalDatum && a.InleverDatum <= verhuuraanvraagDTO.InleverDatum) ||
@@ -83,8 +83,6 @@ namespace CarAndAll.Server.Controllers
                 return Unauthorized("Er is geen ingelogde gebruiker gevonden, log in en probeer het opnieuw");
             }
 
-            Console.WriteLine("HuurderId:" + gebruikerId + " VoertuigId: " + verhuuraanvraagDTO.VoertuigId);
-
             var verhuuraanvraag = new Verhuuraanvraag 
             {
                 OphaalDatum = verhuuraanvraagDTO.OphaalDatum,
@@ -101,11 +99,92 @@ namespace CarAndAll.Server.Controllers
             }
             catch (DbUpdateException ex)
             {
-                Console.WriteLine($"Error saving verhuuraanvraag: {ex.Message}");
                 return StatusCode(500, "Er is een probleem opgetreden bij het verwerken van uw aanvraag. Probeer het later opnieuw.");
             }
 
             return Ok("Verhuuraanvraag succesvol ingediend!");
         }
+
+        [HttpGet("GetVerhuuraanvragen")]
+        [Authorize(Policy = "BackofficeMedewerker")]
+        public async Task<IActionResult> GetVerhuuraanvragen() {
+            var verhuuraanvragen = await _context.Verhuuraanvragen
+                .Include(v => v.Huurder)
+                .Include(v => v.Voertuig)
+                .Select(v => new {
+                    verhuuraanvraagID = v.AanvraagID,
+                    voertuig = $"{v.Voertuig.Merk} {v.Voertuig.Type}",
+                    kenteken = v.Voertuig.Kenteken,
+                    huurder = v.Huurder.Naam,
+                    ophaaldatum = v.OphaalDatum.ToString("dd-MM-yyyy"),
+                    inleverdatum = v.InleverDatum.ToString("dd-MM-yyyy"),
+                    status = v.Status.ToString()
+                })
+                .ToListAsync();
+
+            return Ok(verhuuraanvragen);
+        }
+
+        [HttpPost("BehandelVerhuuraanvraag")]
+        [Authorize(Policy = "BackofficeMedewerker")]
+        public async Task<IActionResult> BehandelVerhuuraanvraag([FromBody] BehandelVerhuuraanvraagDTO behandelVerhuuraanvraagDTO)
+        {
+            try
+            {
+                Console.WriteLine("test: " + behandelVerhuuraanvraagDTO.aanvraagID);
+
+                var aanvraag = await _context.Verhuuraanvragen
+                    .Include(v => v.Voertuig)
+                    .FirstOrDefaultAsync(v => v.AanvraagID == behandelVerhuuraanvraagDTO.aanvraagID);
+
+                if (aanvraag == null)
+                {
+                    return NotFound(new { message = "Verhuuraanvraag not found." });
+                }
+
+                switch (behandelVerhuuraanvraagDTO.status.ToLower())
+                {
+                    case "geaccepteerd":
+                        aanvraag.Status = AanvraagStatus.Geaccepteerd;
+                        break;
+
+                    case "afgewezen":
+                        aanvraag.Status = AanvraagStatus.Afgewezen;
+                        break;
+
+                    default:
+                        return BadRequest(new { message = "Invalid status value." });
+                }
+
+                if (aanvraag.Status == AanvraagStatus.Geaccepteerd)
+                {
+                    var overlappendeAanvragen = await _context.Verhuuraanvragen
+                        .Where(v =>
+                            v.VoertuigId == aanvraag.VoertuigId &&
+                            v.AanvraagID != behandelVerhuuraanvraagDTO.aanvraagID &&
+                            v.Status == AanvraagStatus.InBehandeling &&
+                            (
+                                (v.OphaalDatum >= aanvraag.OphaalDatum && v.OphaalDatum <= aanvraag.InleverDatum) ||
+                                (v.InleverDatum >= aanvraag.OphaalDatum && v.InleverDatum <= aanvraag.InleverDatum) ||
+                                (v.OphaalDatum <= aanvraag.OphaalDatum && v.InleverDatum >= aanvraag.InleverDatum)
+                            ))
+                        .ToListAsync();
+
+                    foreach (var a in overlappendeAanvragen)
+                    {
+                        a.Status = AanvraagStatus.Afgewezen;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Verhuuraanvraag succesvol behandeld." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+            }
+        }
+
     }
 }

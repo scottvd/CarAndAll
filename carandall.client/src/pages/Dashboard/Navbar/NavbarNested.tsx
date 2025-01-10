@@ -1,54 +1,42 @@
 import {
   IconAdjustments,
+  IconAdjustmentsCog,
   IconCalendarStats,
   IconCar,
   IconFileAnalytics,
+  IconFileText,
   IconGauge,
   IconLock,
   IconNotes,
   IconPresentationAnalytics,
+  icons,
+  IconUserCircle,
+  IconUserCog,
 } from '@tabler/icons-react';
 import { Code, Group, ScrollArea } from '@mantine/core';
 import { LinksGroup } from './NavbarLinksGroup/NavbarLinksGroup';
-// import { UserButton } from '../UserButton/UserButton';
-// import { Logo } from './Logo';
 import classes from './NavbarNested.module.css';
-/*
 
-- [ ] Rename all of the sections to their required parts
-- [ ] Add stubs for most links
-- [ ] Certain options should only be visible for certain roles (RBAC)
-- [ ] Add user info at the bottom left corner of the navbar
-- [ ] Look at responsive, make sure it's responsive
-- [ ] implement user story
-- [ ] make sure that is responsive
-- [ ] write user story related stuff into document
-- [ ] notify teammemberse
-- [ ] ask for update on database/registration login (probably tomorrow dec 2 2024)
-
-*/
 const mockdata = [
   { label: 'Dashboard', icon: IconGauge },
+  { label: 'Profiel', icon: IconUserCircle, link: '/' },
   {
     label: 'Abonnementen',
     icon: IconNotes,
     initiallyOpened: true,
     links: [
-      { label: 'Aanvragen abonnement', link: '/dashboard/abonnement' },
+      { label: 'Axanvragen abonnement', link: '/dashboard/abonnement' },
       { label: 'Status abonnementaanvraag', link: '/' },
       { label: 'Abonnement opzeggen', link: '/' },
-      // { label: 'Real time', link: '/' },
     ],
   },
-  {
-    label: 'Voertuigen',
-    icon: IconCar,
-    links: [
-      { label: 'Voertuigen bekijken', link: '/dashboard/voertuigen' }
+  { label: 'Vloot beheren', icon: IconCar, link: '/dashboard/voertuigen' },
+  { label: 'Voertuigen', icon: IconCar, link: '/dashboard/huren' },
+  { label: 'Controlepaneel', icon: IconAdjustmentsCog, links: [
+    { label: 'Verhuuraanvragen beheren', icon: IconFileText, link: '/dashboard/verhuuraanvragen' },
+    { label: 'Medewerkers beheren', icon: IconUserCog, link: '/dashboard/medewerkers' },
     ],
   },
-  { label: 'Analytics', icon: IconPresentationAnalytics },
-  { label: 'Contracts', icon: IconFileAnalytics },
   { label: 'Settings', icon: IconAdjustments },
   {
     label: 'Security',

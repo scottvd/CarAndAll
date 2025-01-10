@@ -51,8 +51,6 @@ export function Overzicht() {
         }
 
         const data = await resultaat.json();
-        console.log(data);
-
         setData(data);
       }
     } catch (error) {
@@ -135,6 +133,17 @@ export function Overzicht() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
 
+  const calculateSubtotal = (startDate: Date | null, endDate: Date | null, pricePerDay: number) => {
+    if (startDate && endDate) {
+      const days = Math.max(
+        1,
+        Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+      );
+      return (days * pricePerDay).toFixed(2);
+    }
+    return "0.00";
+  };
+
   return (
     <div>
       <h2>Huren</h2>
@@ -145,15 +154,15 @@ export function Overzicht() {
           onChange={setOphaalDatum}
           label="Ophaaldatum"
           placeholder="Klik hier om een ophaaldatum te kiezen"
-          minDate={tomorrow} // Prevent selecting dates earlier than tomorrow
-          maxDate={inleverDatum || undefined} // Ensure the start date is before the end date
+          minDate={tomorrow}
+          maxDate={inleverDatum || undefined}
         />
         <DateInput
           value={inleverDatum}
           onChange={setInleverDatum}
           label="Inleverdatum"
           placeholder="Klik hier om een inleverdatum te kiezen"
-          minDate={ophaalDatum || tomorrow} // Ensure the end date is after the start date and tomorrow
+          minDate={ophaalDatum || tomorrow}
         />
         <Button onClick={getVoertuigen}>Voertuigen weergeven</Button>
       </Group>
@@ -178,6 +187,31 @@ export function Overzicht() {
               {" "}tot{" "}
               <strong>{inleverDatum?.toLocaleDateString()}</strong>
             </Text>
+
+            {ophaalDatum && inleverDatum && (
+              <Text>
+                <strong>Subtotaal:</strong> huurprijs van €{selectedVoertuig.prijs.toFixed(2)} per dag over een
+                periode van{" "}
+                {Math.max(
+                  1,
+                  Math.ceil(
+                    (inleverDatum.getTime() - ophaalDatum.getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  ) + 1
+                )}{" "}
+                dagen:{" "}
+                <strong>
+                  €{calculateSubtotal(ophaalDatum, inleverDatum, selectedVoertuig.prijs)}
+                </strong>
+              </Text>
+            )}
+
+            <Group justify="space-between" mt="md">
+              <Button color="red" variant="outline" onClick={() => setIsModalOpen(false)}>
+                Annuleren
+              </Button>
+              <Button color="green" onClick={confirmAanvraag}>Bevestigen</Button>
+            </Group>
           </div>
         )}
       </Modal>
