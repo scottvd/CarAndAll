@@ -121,7 +121,10 @@ export function Verhuuraanvragen() {
               <th>Handelingen</th>
             </tr>
           </thead>
-          <tbody>{renderRows(openstaandeData, true)}</tbody>
+          
+          <tbody>
+            {renderRows(openstaandeData, true)}
+          </tbody>
         </Table>
       </div>
 
