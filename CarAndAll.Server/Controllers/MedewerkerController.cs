@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 using CarAndAll.Server.Data;
 using CarAndAll.Server.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,21 +25,25 @@ namespace CarAndAll.Server.Controllers
         public async Task<IActionResult> GetMedewerkers()
         {
             var medewerkers = await _context.Medewerkers.ToListAsync();
-            return Ok(medewerkers);
-        }
+            var medewerkersMetRol = new List<object>();
 
-        [HttpGet("GetMedewerker/{id}")]
-        [Authorize(Policy = "BackofficeMedewerker")]
-        public async Task<IActionResult> GetMedewerker(string Id)
-        {
-            var medewerker = await _context.Medewerkers.FindAsync(Id);
-            if (medewerker == null)
+            foreach (var medewerker in medewerkers)
             {
-                return NotFound("Medewerker niet gevonden.");
-            }
-            return Ok(medewerker);
-        }
+                var rollen = await _userManager.GetRolesAsync(medewerker);
+                var rol = rollen.Contains("BackofficeMedewerker") ? "BackofficeMedewerker" : "FrontofficeMedewerker";
 
+                medewerkersMetRol.Add(new
+                {
+                    Id = medewerker.Id,
+                    Naam = medewerker.Naam,
+                    PersoneelsNummer = medewerker.PersoneelsNummer,
+                    Email = medewerker.Email,
+                    Rol = rol
+                });
+            }
+
+            return Ok(medewerkersMetRol);
+        }
 
         [HttpPost("AddMedewerker")]
         [Authorize(Policy = "BackofficeMedewerker")]
@@ -52,10 +54,10 @@ namespace CarAndAll.Server.Controllers
                 return BadRequest("Er is iets fout gegaan tijdens het toevoegen. Probeer het opnieuw!");
             }
 
-            var gebruiktEmail = await _context.Medewerkers.Where(m => m.NormalizedEmail.Equals(dto.Email.ToUpper())).AnyAsync();
+            var bestaandMedewerker = await _context.Medewerkers.Where(m => m.NormalizedEmail.Equals(dto.Email.ToUpper()) || m.PersoneelsNummer == dto.Personeelsnummer).AnyAsync();
 
-            if(gebruiktEmail) {
-                return Conflict("Er bestaat al een gebruiker met dit emailadres.");
+            if(bestaandMedewerker) {
+                return Conflict("Er bestaat al een gebruiker met dit emailadres of personeelsnummer.");
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -92,11 +94,80 @@ namespace CarAndAll.Server.Controllers
             }
         }
 
-        [HttpPut("EditMedewerker/{id}")]
-        [Authorize(Policy = "BackofficeMedewerkers")]
-        public async Task<IActionResult> EditMedewerker()
+        [HttpPut("EditMedewerker")]
+        [Authorize(Policy = "BackofficeMedewerker")]
+        public async Task<IActionResult> EditMedewerker([FromBody] EditMedewerkerDTO dto)
         {
+            Console.WriteLine("medewerker: " + dto.MedewerkerID);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Er is iets fout gegaan tijdens het bewerken. Probeer het opnieuw!");
+            }
+
+            var medewerker = await _context.Medewerkers.FindAsync(dto.MedewerkerID);
+
+            if (medewerker == null)
+            {
+                return BadRequest("Medewerker bestaat niet.");
+            }
+
+            if (dto.Naam != null &&!medewerker.Naam.Equals(dto.Naam))
+            {
+                medewerker.Naam = dto.Naam;
+            }
+
+            if (medewerker.PersoneelsNummer != dto.PersoneelsNummer)
+            {
+                medewerker.PersoneelsNummer = dto.PersoneelsNummer;
+            }
+
+            if (dto.Email != null && !medewerker.Email.Equals(dto.Email))
+            {
+                medewerker.Email = dto.Email;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.NieuwWachtwoord))
+            {
+                var result = await _userManager.ChangePasswordAsync(medewerker, dto.OudWachtwoord, dto.NieuwWachtwoord);
+                if (!result.Succeeded)
+                {
+                    return BadRequest("Wachtwoord kan niet worden gewijzigd.");
+                }
+            }
+
+            if (dto.Backoffice)
+            {
+                if (!await _userManager.IsInRoleAsync(medewerker, "BackofficeMedewerker"))
+                {
+                    var addToRoleResult = await _userManager.AddToRoleAsync(medewerker, "BackofficeMedewerker");
+
+                    if (!addToRoleResult.Succeeded)
+                    {
+                        return BadRequest("Kan de medewerker niet aan de BackofficeMedewerker rol toevoegen.");
+                    }
+                }
+            }
+
+            _context.Medewerkers.Update(medewerker);
+            await _context.SaveChangesAsync();
+
             return Ok("Medewerker succesvol bijgewerkt.");
         }
+
+        [HttpDelete("DeleteMedewerker")]
+        [Authorize(Policy = "BackofficeMedewerker")]
+        public async Task<IActionResult> DeleteMedewerker([FromBody] string Id)
+        {
+            var medewerker = await _context.Medewerkers.FindAsync(Id);
+            if (medewerker == null)
+            {
+                return NotFound("Medewerker niet gevonden.");
+            }
+
+            _context.Medewerkers.Remove(medewerker);
+            await _context.SaveChangesAsync();
+            return Ok("Medewerker succesvol verwijderd!");
+        }
+
     }
 }

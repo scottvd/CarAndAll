@@ -210,7 +210,9 @@ export function Overzicht() {
               <Button color="red" variant="outline" onClick={() => setIsModalOpen(false)}>
                 Annuleren
               </Button>
-              <Button color="green" onClick={confirmAanvraag}>Bevestigen</Button>
+              <Button color="green" onClick={confirmAanvraag}>
+                Bevestigen
+              </Button>
             </Group>
           </div>
         )}
