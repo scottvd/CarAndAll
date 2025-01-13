@@ -3,7 +3,7 @@ import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
 import { Button, Group, PasswordInput, TextInput } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isEmail, useForm } from "@mantine/form";
 
 type Gebruiker = {
     gebruikerID: string;
@@ -12,6 +12,9 @@ type Gebruiker = {
     adres: string;
     wachtwoord: string;
     rol: string;
+    bedrijfsAdres?: string;
+    bedrijfsNaam?: string;
+    kvkNummer?: string;
 };
 
 export function Profiel() {
@@ -26,33 +29,54 @@ export function Profiel() {
     const formulier = useForm({
       mode: 'controlled',
       initialValues: {
-        email: "",
-        naam: "",
-        adres: "",
+        email: data?.email || "",
+        naam: data?.naam || "",
+        adres: data?.adres || "",
         nieuwWachtwoord: "",
         oudWachtwoord: "",
+        bedrijfsAdres: data?.bedrijfsAdres || "",
+        bedrijfsNaam: data?.bedrijfsNaam || "",
+        kvkNummer: data?.kvkNummer || "",
       },
       validate: {
-        naam: isNotEmpty("Vul dit verplichte veld in"),
-        email: isEmail("Ongeldig emailadres"),
-        adres: (value) =>
-          !value || value.trim() === ""
-            ? "Adres is verplicht"
-            : !/^[a-zA-Z\s]+[0-9]+$/.test(value)
-            ? "Adres moet beginnen met tekst en eindigen op een nummer"
-            : null,
+        naam: (value) => value && value.trim() === "" ? "Vul dit verplichte veld in" : null,
+        email: (value) => value && !isEmail(value) ? "Ongeldig emailadres" : null,
+        adres: (value, values) => {
+          if (data?.rol !== "Wagenparkbeheerder" && value && !/^[a-zA-Z\s]+[0-9]+$/.test(value)) {
+            return "Adres moet beginnen met tekst en eindigen op een nummer";
+          }
+          return null;
+        },
         nieuwWachtwoord: (value) => {
-            if (value && (value.length < 8 || !/[A-Z]/.test(value) || !/\d/.test(value))) {
-              return "Wachtwoord moet minimaal 8 tekens lang zijn, een hoofdletter en een cijfer bevatten";
-            }
-            return null;
-          },
+          if (value && (value.length < 8 || !/[A-Z]/.test(value) || !/\d/.test(value))) {
+            return "Wachtwoord moet minimaal 8 tekens lang zijn, een hoofdletter en een cijfer bevatten";
+          }
+          return null;
+        },
         oudWachtwoord: (value, values) => {
-            if (values.nieuwWachtwoord && !value) {
-              return "Oud wachtwoord is verplicht als nieuw wachtwoord is ingevuld.";
-            }
-            return null;
-        }
+          if (values.nieuwWachtwoord && !value) {
+            return "Oud wachtwoord is verplicht als nieuw wachtwoord is ingevuld.";
+          }
+          return null;
+        },
+        bedrijfsAdres: (value, values) => {
+          if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
+            return "Bedrijfsadres is verplicht";
+          }
+          return null;
+        },
+        bedrijfsNaam: (value, values) => {
+          if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
+            return "Bedrijfsnaam is verplicht";
+          }
+          return null;
+        },
+        kvkNummer: (value, values) => {
+          if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
+            return "KVK-nummer is verplicht";
+          }
+          return null;
+        },
       },
     });
 
@@ -98,12 +122,37 @@ export function Profiel() {
                     {...formulier.getInputProps("naam")}
                 />
 
-                <TextInput
-                    label="Adres"
-                    placeholder={data?.adres}
-                    mb="sm"
-                    {...formulier.getInputProps("adres")}
-                />
+                {data?.rol === "Particulier" && (
+                    <TextInput
+                        label="Adres"
+                        placeholder={data?.adres}
+                        mb="sm"
+                        {...formulier.getInputProps("adres")}
+                    />
+                )}
+
+                {data?.rol === "Wagenparkbeheerder" && (
+                    <>
+                        <TextInput
+                            label="Bedrijfsadres"
+                            placeholder={data?.bedrijfsAdres}
+                            mb="sm"
+                            {...formulier.getInputProps("bedrijfsAdres")}
+                        />
+                        <TextInput
+                            label="Bedrijfsnaam"
+                            placeholder={data?.bedrijfsNaam}
+                            mb="sm"
+                            {...formulier.getInputProps("bedrijfsNaam")}
+                        />
+                        <TextInput
+                            label="KVK-nummer"
+                            placeholder={data?.kvkNummer}
+                            mb="sm"
+                            {...formulier.getInputProps("kvkNummer")}
+                        />
+                    </>
+                )}
 
                 <PasswordInput
                     label="Nieuw wachtwoord (optioneel)"

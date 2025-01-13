@@ -40,31 +40,58 @@ namespace CarAndAll.Controllers
                     var rollen = _gebruikerRollenService.GetGebruikerRollen();
 
                     if(rollen != null) {
-                        string rol;
+                        string rol = "Particulier";
 
                         if (rollen.Contains("Wagenparkbeheerder")) {
                             rol = "Wagenparkbeheerder";
-                        } else if (rollen.Contains("Zakelijk")) {
+
+                            var bedrijf = await _context.Bedrijven
+                                .Where(b => b.Huurders.Any(h => h.Id == gebruikerId))
+                                .FirstOrDefaultAsync();
+
+                            if (bedrijf != null) {
+                                var wagenparkbeheerder = new {
+                                    gebruiker.Id,
+                                    gebruiker.Naam,
+                                    gebruiker.Email,
+                                    gebruiker.Adres,
+                                    bedrijfsNaam = bedrijf.Naam,
+                                    bedrijfsAdres = bedrijf.Adres,
+                                    bedrijf.KvkNummer,
+                                    Rol = rol
+                                };
+
+                                return Ok(wagenparkbeheerder);
+                            }
+                        } 
+                        else if (rollen.Contains("Zakelijk")) {
                             rol = "Zakelijk";
-                        } else {
-                            rol = "Particulier";
+
+                            var zakelijkHuurder = new {
+                                gebruiker.Id,
+                                gebruiker.Naam,
+                                gebruiker.Email,
+                                Rol = rol
+                            };
+
+                            return Ok(zakelijkHuurder);
+                        } 
+                        else {
+                            var gebruikerMetRol = new {
+                                gebruiker.Id,
+                                gebruiker.Naam,
+                                gebruiker.Email,
+                                gebruiker.Adres,
+                                Rol = rol
+                            };
+
+                            return Ok(gebruikerMetRol);
                         }
-
-                        var gebruikerMetRol = new {
-                            gebruiker.Id,
-                            gebruiker.Naam,
-                            gebruiker.Email,
-                            gebruiker.Adres,
-                            Rol = rol
-                        };
-
-                        return Ok(gebruikerMetRol);
                     }                    
                 }
             }
 
             return Unauthorized(new { Message = "U moet inloggen voor u uw profiel kunt inzien" });
         }
-
     }
 }
