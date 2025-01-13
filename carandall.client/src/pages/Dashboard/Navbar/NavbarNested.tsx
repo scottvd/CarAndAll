@@ -1,15 +1,8 @@
 import {
-  IconAdjustments,
   IconAdjustmentsCog,
-  IconCalendarStats,
   IconCar,
-  IconFileAnalytics,
   IconFileText,
   IconGauge,
-  IconLock,
-  IconNotes,
-  IconPresentationAnalytics,
-  icons,
   IconUserCircle,
   IconUserCog,
 } from '@tabler/icons-react';
@@ -19,34 +12,34 @@ import classes from './NavbarNested.module.css';
 
 const mockdata = [
   { label: 'Dashboard', icon: IconGauge },
-  { label: 'Profiel', icon: IconUserCircle, link: '/' },
   {
-    label: 'Abonnementen',
-    icon: IconNotes,
-    initiallyOpened: true,
+    label: 'Profiel',
+    icon: IconUserCircle,
     links: [
-      { label: 'Axanvragen abonnement', link: '/dashboard/abonnement' },
-      { label: 'Status abonnementaanvraag', link: '/' },
-      { label: 'Abonnement opzeggen', link: '/' },
-    ],
+      { label: 'Gegevens bewerken', link: '/dashboard/profiel' }
+    ]
   },
-  { label: 'Vloot beheren', icon: IconCar, link: '/dashboard/voertuigen' },
-  { label: 'Voertuigen', icon: IconCar, link: '/dashboard/huren' },
+  {
+    label: 'Vloot',
+    icon: IconCar,
+    initiallyOpened: false,
+    links: [
+      { label: 'Vloot beheren', link: '/dashboard/voertuigen' }
+    ]
+  },
+  {
+    label: 'Huren',
+    icon: IconCar,
+    initiallyOpened: false,
+    links: [
+      { label: 'Voertuigen bekijken', link: '/dashboard/huren' }
+    ]
+  },
   { label: 'Controlepaneel', icon: IconAdjustmentsCog, links: [
-    { label: 'Verhuuraanvragen beheren', icon: IconFileText, link: '/dashboard/verhuuraanvragen' },
-    { label: 'Medewerkers beheren', icon: IconUserCog, link: '/dashboard/medewerkers' },
-    ],
-  },
-  { label: 'Settings', icon: IconAdjustments },
-  {
-    label: 'Security',
-    icon: IconLock,
-    links: [
-      { label: 'Enable 2FA', link: '/' },
-      { label: 'Change password', link: '/' },
-      { label: 'Recovery codes', link: '/' },
-    ],
-  },
+    { label: 'Medewerkers beheren', icon: IconUserCog, link: '/dashboard/controlepaneel' },
+    { label: 'Verhuuraanvragen beheren', icon: IconFileText, link: '/dashboard/controlepaneel/verhuuraanvragen' }
+    ]
+  }
 ];
 
 export function NavbarNested() {

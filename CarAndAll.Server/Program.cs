@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using CarAndAll.Services;
 
 namespace CarAndAll.Server
 {
@@ -67,6 +68,9 @@ namespace CarAndAll.Server
             {
                 options.HeaderName = "X-CSRF-Token";
             });
+
+            builder.Services.AddScoped<IGebruikerIdService, GebruikerIdService>();
+            builder.Services.AddScoped<IGebruikerRollenService, GebruikerRollenService>();
 
             var app = builder.Build();
 

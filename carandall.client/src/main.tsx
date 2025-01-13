@@ -23,6 +23,7 @@ import { Unauthorised } from "./pages/Static/Unauthorised.tsx";
 import { IncorrectRole } from "./pages/Static/IncorrectRole.tsx";
 import { Verhuuraanvragen } from "./pages/Controlepaneel/Verhuuraanvragen.tsx";
 import { Medewerkers } from "./pages/Controlepaneel/Medewerkers.tsx";
+import { Profiel } from "./pages/Profiel/Profiel.tsx";
 
 export const api = axios.create({
   baseURL: "https://localhost:7140",
@@ -40,18 +41,30 @@ const router = createBrowserRouter([
     children: [
       { path: "abonnement", element: <Aanvragen /> },
       {
+        path: "profiel",
+        element: <Outlet />,
+        children: [
+          { index: true, element: <Profiel /> },
+        ]
+      },
+      {
         path: "voertuigen",
         element: <Outlet />,
         children: [
           { index: true, element: <Voertuigen /> },
           { path: "voertuig", element: <Voertuig /> },
-          { path: "toevoegen", element: <Toevoegen /> },
-        ],
+          { path: "toevoegen", element: <Toevoegen /> }
+        ]
       },
       { path: "huren", element: <Overzicht /> },
-      { path: "verhuuraanvragen", element: <Verhuuraanvragen /> },
-      { path: "medewerkers", element: <Medewerkers /> }
-
+      {
+        path: "controlepaneel",
+        element: <Outlet />,
+        children: [
+          { index: true, element: <Medewerkers />},
+          { path: "verhuuraanvragen", element: <Verhuuraanvragen /> },
+        ]
+      }
     ]
   },
   {

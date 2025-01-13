@@ -58,21 +58,19 @@ export function Medewerkers() {
       naam: isNotEmpty("Vul dit verplichte veld in"),
       personeelsNummer: isNotEmpty("Vul dit verplichte veld in"),
       email: isEmail("Ongeldig emailadres"),
-  
       nieuwWachtwoord: (value) => {
         if (value && (value.length < 8 || !/[A-Z]/.test(value) || !/\d/.test(value))) {
           return "Wachtwoord moet minimaal 8 tekens lang zijn, een hoofdletter en een cijfer bevatten";
         }
         return null;
       },
-  
       oudWachtwoord: (value, values) => {
         if (values.nieuwWachtwoord && !value) {
           return "Oud wachtwoord is verplicht als nieuw wachtwoord is ingevuld.";
         }
         return null;
-      },
-    },
+      }
+    }
   });
   
 

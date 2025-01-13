@@ -7,23 +7,24 @@
     using System.Threading.Tasks;
     using CarAndAll.Server.Models;
     using System.Collections.Generic;
+using CarAndAll.Services;
 
-    [ApiController]
+[ApiController]
     [Route("api/[controller]")]
     public class AuthenticatieController : ControllerBase
     {
         private readonly SignInManager<Gebruiker> _signInManager;
         private readonly UserManager<Gebruiker> _userManager;
         private readonly IConfiguration _configuration;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IGebruikerRollenService _gebruikerRollenService;
 
 
-        public AuthenticatieController(SignInManager<Gebruiker> signInManager, UserManager<Gebruiker> userManager, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public AuthenticatieController(SignInManager<Gebruiker> signInManager, UserManager<Gebruiker> userManager, IConfiguration configuration, IGebruikerRollenService gebruikerRollenService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _configuration = configuration;
-            _httpContextAccessor = httpContextAccessor;
+            _gebruikerRollenService = gebruikerRollenService;
         }
 
         [HttpPost("LogIn")]
@@ -79,9 +80,9 @@
         [HttpPost("HeeftToestemming")]
         public bool HeeftToestemming([FromBody] string[]? rollen)
         {
-            var token = _httpContextAccessor.HttpContext.Request.Cookies["jwtToken"];
+            var gebruikerRollen = _gebruikerRollenService.GetGebruikerRollen();
             
-            if (!string.IsNullOrEmpty(token))
+            if (gebruikerRollen != null)
             {
                 if(rollen == null || !rollen.Any()) {
                     return true;
@@ -89,20 +90,9 @@
                 
                 try
                 {
-                    var handler = new JwtSecurityTokenHandler();
-                    var jwtToken = handler.ReadJwtToken(token);
-                    
-                    var rolClaims = jwtToken.Claims
-                                            .Where(c => c.Type == ClaimTypes.Role || c.Type == "role")
-                                            .Select(c => c.Value)
-                                            .ToList();
-                    
-                    if (rolClaims != null && rolClaims.Any())
-                    {
-                        var heeftToestemming = rollen.Any(rol => rolClaims.Contains(rol, StringComparer.OrdinalIgnoreCase));
+                    var heeftToestemming = rollen.Any(rol => gebruikerRollen.Contains(rol, StringComparer.OrdinalIgnoreCase));
                         
-                        return heeftToestemming;
-                    }
+                    return heeftToestemming;
                 }
                 catch (Exception ex)
                 {
