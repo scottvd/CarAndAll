@@ -21,5 +21,8 @@ namespace CarAndAll.Server.Models
         public Bedrijf? Bedrijf { get; set; }
 
         public List<Verhuuraanvraag>? Verhuuraanvraagen { get; set; }
+
+        public int? GegevensverwijderingId { get; set; }
+        public Gegevensverwijdering? Gegevensverwijdering { get; set; }
     }
 }

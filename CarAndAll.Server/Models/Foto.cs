@@ -14,6 +14,7 @@
             public Schademelding Schademelding { get; set; }
 
             [Required]
+            public string MedewerkerId { get; set; }
             public Medewerker Medewerker { get; set; } 
         }
     }

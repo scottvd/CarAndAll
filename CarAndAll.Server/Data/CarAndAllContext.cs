@@ -32,27 +32,44 @@ namespace CarAndAll.Server.Data
                 .HasOne(v => v.Huurder)
                 .WithMany(k => k.Verhuuraanvraagen)
                 .HasForeignKey(v => v.HuurderId)
-                .HasPrincipalKey(h => h.Id);
+                .HasPrincipalKey(h => h.Id)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Verhuuraanvraag>()
                 .HasOne(v => v.Voertuig)
                 .WithMany(v => v.Verhuuraanvragen)
-                .HasForeignKey(v => v.VoertuigId);
+                .HasForeignKey(v => v.VoertuigId)
+                .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Voertuig>()
-                .HasMany(v => v.Schademeldingen)
-                .WithOne(s => s.Voertuig)
-                .HasForeignKey(s => s.VoertuigId);
+            modelBuilder.Entity<Schademelding>()
+                .HasOne(s => s.Voertuig)
+                .WithMany(v => v.Schademeldingen)
+                .HasForeignKey(s => s.VoertuigId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Schademelding>()
                 .HasOne(s => s.Medewerker)
                 .WithMany(m => m.Schademeldingen)
-                .HasForeignKey(s => s.MedewerkerId);
+                .HasForeignKey(s => s.MedewerkerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
 
             modelBuilder.Entity<Notitie>()
                 .HasOne(n => n.Medewerker)
                 .WithMany(m => m.Notities)
-                .HasForeignKey(n => n.MedewerkerId);
+                .HasForeignKey(n => n.MedewerkerId)
+                .OnDelete(DeleteBehavior.SetNull);
+        
+            modelBuilder.Entity<Foto>()
+                .HasOne(f => f.Medewerker)
+                .WithMany(m => m.Fotos)
+                .HasForeignKey(f => f.MedewerkerId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Gegevensverwijdering>()
+                .HasOne(g => g.Huurder)
+                .WithOne(h => h.Gegevensverwijdering)
+                .HasForeignKey<Gegevensverwijdering>(g => g.HuurderId);
         }
 
         public DbSet<Abonnement> Abonnementen { get; set; }
@@ -64,5 +81,6 @@ namespace CarAndAll.Server.Data
         public DbSet<Schademelding> Schademeldingen { get; set; }
         public DbSet<Verhuuraanvraag> Verhuuraanvragen { get; set; }
         public DbSet<Voertuig> Voertuigen { get; set; }
+        public DbSet<Gegevensverwijdering> Gegevensverwijderingen { get; set; }
     }
 }
