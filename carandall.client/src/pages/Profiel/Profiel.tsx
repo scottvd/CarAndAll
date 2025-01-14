@@ -148,7 +148,31 @@ export function Profiel() {
             }
         }
     };
-    
+
+    const handleVerwijderingsverzoek = async () => {
+        if(data) {
+            try {        
+                const resultaat = await fetchCsrf("http://localhost:5202/api/Profiel/AddVerwijderingsverzoek", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(data.id),
+                });
+        
+                if (resultaat.ok) {
+                    alert("Verwijderingsverzoek succesvol ingediend! Over 6 maanden worden uw gegevens definitied verwijderd.");
+                } 
+                else {
+                    alert("Er is iets fout gegaan tijdens het aanmaken van het verwijderingsverzoek. Probeer het opnieuw!");
+                }
+            } catch (error) {
+                console.error("Fout: ", error);
+            }
+        }
+    };
+
 
     return (
         <div>
@@ -220,7 +244,7 @@ export function Profiel() {
                         Opslaan
                     </Button>
                     
-                    <Button color="red" onClick={() => console.log()}>
+                    <Button color="red" onClick={() => handleVerwijderingsverzoek()}>
                         Gegevens verwijderen
                     </Button>
                 </Group>

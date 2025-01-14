@@ -71,6 +71,7 @@ namespace CarAndAll.Server
 
             builder.Services.AddScoped<IGebruikerIdService, GebruikerIdService>();
             builder.Services.AddScoped<IGebruikerRollenService, GebruikerRollenService>();
+            builder.Services.AddHostedService<BehandelVerwijderingsverzoekService>();
 
             var app = builder.Build();
 

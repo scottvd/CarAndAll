@@ -5,6 +5,7 @@ using CarAndAll.Server.Data;
 using CarAndAll.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CarAndAll.Controllers
 {
@@ -159,6 +160,40 @@ namespace CarAndAll.Controllers
             await _context.SaveChangesAsync();
 
             return Ok("Medewerker succesvol bijgewerkt.");
+        }
+
+        [HttpPost("AddVerwijderingsverzoek")]
+        [Authorize(Policy = "Huurders")]
+        public async Task<IActionResult> AddVerwijderingsverzoek([FromBody] string HuurderId)
+        {
+            if (HuurderId.IsNullOrEmpty())
+            {
+                return BadRequest("Geen gebruiker gevonden. Log in en probeer het opnieuw!");
+            }
+
+            var huurder = await _context.Huurders.Where(h => h.Id.Equals(HuurderId)).FirstAsync();
+
+            if(huurder == null) {
+                return BadRequest("Geen gebruiker gevonden. Log in en probeer het opnieuw!");
+            }
+
+            try {
+                var verwijderingsverzoek = new Verwijderingsverzoek {
+                    Datum = DateTime.Now,
+                    Huurder = huurder
+                };
+
+                _context.Verwijderingsverzoeken.Add(verwijderingsverzoek);
+                await _context.SaveChangesAsync();
+                
+                return Ok("Verwijderingsverzoek succesvol ingediend, over 6 maanden worden uw gegevens definitief verwijderd.");
+            } catch (Exception ex) {
+                return StatusCode(500, new
+                {
+                    Message = "Er is iets fout gegaan.",
+                    Error = ex.Message,
+                });
+            }
         }
     }
 }
