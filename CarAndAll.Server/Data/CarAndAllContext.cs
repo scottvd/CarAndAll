@@ -66,10 +66,10 @@ namespace CarAndAll.Server.Data
                 .HasForeignKey(f => f.MedewerkerId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<Gegevensverwijdering>()
+            modelBuilder.Entity<Verwijderingsverzoek>()
                 .HasOne(g => g.Huurder)
-                .WithOne(h => h.Gegevensverwijdering)
-                .HasForeignKey<Gegevensverwijdering>(g => g.HuurderId);
+                .WithOne(h => h.Verwijderingsverzoek)
+                .HasForeignKey<Verwijderingsverzoek>(g => g.HuurderId);
         }
 
         public DbSet<Abonnement> Abonnementen { get; set; }
@@ -81,6 +81,6 @@ namespace CarAndAll.Server.Data
         public DbSet<Schademelding> Schademeldingen { get; set; }
         public DbSet<Verhuuraanvraag> Verhuuraanvragen { get; set; }
         public DbSet<Voertuig> Voertuigen { get; set; }
-        public DbSet<Gegevensverwijdering> Gegevensverwijderingen { get; set; }
+        public DbSet<Verwijderingsverzoek> Verwijderingsverzoeken { get; set; }
     }
 }

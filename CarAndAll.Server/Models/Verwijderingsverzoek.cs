@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CarAndAll.Server.Models
 {
-    public class Gegevensverwijdering
+    public class Verwijderingsverzoek
     {
         [Key]
         public int GegevensverwijderingId { get; set; }

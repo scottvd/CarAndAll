@@ -22,7 +22,7 @@ namespace CarAndAll.Server.Models
 
         public List<Verhuuraanvraag>? Verhuuraanvraagen { get; set; }
 
-        public int? GegevensverwijderingId { get; set; }
-        public Gegevensverwijdering? Gegevensverwijdering { get; set; }
+        public int? VerwijderingsverzoekId { get; set; }
+        public Verwijderingsverzoek? Verwijderingsverzoek { get; set; }
     }
 }
