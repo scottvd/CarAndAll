@@ -26,9 +26,9 @@ namespace CarAndAll.Controllers
             _gebruikerRollenService = gebruikerRollenService;
         }
 
-        [HttpGet("GetGebruiker")]
+        [HttpGet("GetHuurder")]
         [Authorize(Policy = "Huurders")]
-        public async Task<IActionResult> GetGebruiker() {
+        public async Task<IActionResult> GetHuurder() {
             var gebruikerId = _gebruikerIdService.GetGebruikerId();
 
             if (gebruikerId != null) {
@@ -47,7 +47,7 @@ namespace CarAndAll.Controllers
 
                             var bedrijf = await _context.Bedrijven
                                 .Where(b => b.Huurders.Any(h => h.Id == gebruikerId))
-                                .FirstOrDefaultAsync();
+                                .FirstAsync();
 
                             if (bedrijf != null) {
                                 var wagenparkbeheerder = new {
@@ -92,6 +92,73 @@ namespace CarAndAll.Controllers
             }
 
             return Unauthorized(new { Message = "U moet inloggen voor u uw profiel kunt inzien" });
+        }
+
+        [HttpPut("EditHuurder")]
+        [Authorize(Policy = "Huurders")]
+        public async Task<IActionResult> EditHuurder([FromBody] EditHuurderDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Er is iets fout gegaan tijdens het bewerken. Probeer het opnieuw!");
+            }
+
+            var huurder = await _context.Huurders.FindAsync(dto.HuurderID);
+
+            if (huurder == null)
+            {
+                return BadRequest("Huurder bestaat niet.");
+            }
+
+            if (dto.Naam != null && !huurder.Naam.Equals(dto.Naam))
+            {
+                huurder.Naam = dto.Naam;
+            }
+
+            if(dto.Rol != null) {
+                if(dto.Rol.Equals("Particulier") && dto.Adres != null && !huurder.Adres.Equals(dto.Adres)) {
+                    huurder.Adres = dto.Adres;
+                }
+
+                if(dto.Rol.Equals("Wagenparkbeheerder")) {
+                    var bedrijf = await _context.Bedrijven
+                        .Where(b => b.Huurders.Any(h => h.Id == dto.HuurderID))
+                        .FirstAsync();
+
+                    if(bedrijf != null) {
+                        if(dto.BedrijfsAdres != null && !bedrijf.Adres.Equals(dto.BedrijfsAdres)) {
+                            bedrijf.Adres = dto.BedrijfsAdres;
+                        }
+
+                        if(dto.BedrijfsNaam != null && !bedrijf.Naam.Equals(dto.BedrijfsNaam)) {
+                            bedrijf.Naam = dto.BedrijfsNaam;
+                        }
+
+                        if(dto.KVKNummer != null && bedrijf.KvkNummer != dto.KVKNummer) {
+                            bedrijf.KvkNummer = (int)dto.KVKNummer;
+                        }
+                    }
+                }
+            }
+
+            if (dto.Email != null && !huurder.Email.Equals(dto.Email))
+            {
+                huurder.Email = dto.Email;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.NieuwWachtwoord))
+            {
+                var result = await _userManager.ChangePasswordAsync(huurder, dto.OudWachtwoord, dto.NieuwWachtwoord);
+                if (!result.Succeeded)
+                {
+                    return BadRequest("Wachtwoord kan niet worden gewijzigd.");
+                }
+            }
+
+            _context.Huurders.Update(huurder);
+            await _context.SaveChangesAsync();
+
+            return Ok("Medewerker succesvol bijgewerkt.");
         }
     }
 }

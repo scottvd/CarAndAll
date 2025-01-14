@@ -5,25 +5,24 @@ import { fetchCsrf } from "../../utilities/fetchCsrf";
 import { Button, Group, PasswordInput, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 
-type Gebruiker = {
-    gebruikerID: string;
+type Huurder = {
+    id: string;
     naam: string;
     email: string;
     adres: string;
-    wachtwoord: string;
     rol: string;
     bedrijfsAdres?: string;
     bedrijfsNaam?: string;
-    kvkNummer?: string;
+    kvkNummer?: number;
 };
 
 export function Profiel() {
     useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);
 
-    const [data, setData] = useState<Gebruiker | null>(null);
+    const [data, setData] = useState<Huurder | null>(null);
 
     useEffect(() => {
-      getGebruiker();
+      getHuurder();
     }, []);
 
     const formulier = useForm({
@@ -41,7 +40,7 @@ export function Profiel() {
       validate: {
         naam: (value) => value && value.trim() === "" ? "Vul dit verplichte veld in" : null,
         email: (value) => value && !isEmail(value) ? "Ongeldig emailadres" : null,
-        adres: (value, values) => {
+        adres: (value) => {
           if (data?.rol !== "Wagenparkbeheerder" && value && !/^[a-zA-Z\s]+[0-9]+$/.test(value)) {
             return "Adres moet beginnen met tekst en eindigen op een nummer";
           }
@@ -59,30 +58,35 @@ export function Profiel() {
           }
           return null;
         },
-        bedrijfsAdres: (value, values) => {
+        bedrijfsAdres: (value) => {
           if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
             return "Bedrijfsadres is verplicht";
           }
           return null;
         },
-        bedrijfsNaam: (value, values) => {
+        bedrijfsNaam: (value) => {
           if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
             return "Bedrijfsnaam is verplicht";
           }
           return null;
         },
-        kvkNummer: (value, values) => {
-          if (data?.rol === "Wagenparkbeheerder" && value && value.trim() === "") {
-            return "KVK-nummer is verplicht";
-          }
+        kvkNummer: (value) => {
+            if (data?.rol === "Wagenparkbeheerder") {
+                if (!value) {
+                    return "KVK-nummer is verplicht";
+                }
+                if (!/^\d{8}$/.test(String(value))) {
+                    return "KVK-nummer moet exact 8 cijfers bevatten";
+                }
+            }
           return null;
         },
       },
     });
 
-    const getGebruiker = async () => {
+    const getHuurder = async () => {
         try {
-            const resultaat = await fetch( "http://localhost:5202/api/Profiel/GetGebruiker",
+            const resultaat = await fetch( "http://localhost:5202/api/Profiel/GetHuurder",
             {
                 method: "GET",
                 credentials: "include",
@@ -102,6 +106,49 @@ export function Profiel() {
             console.error(error);
         }
     };
+
+    const handleBewerken = async () => {
+        const isValid = await formulier.validate();
+    
+        if (!isValid.hasErrors) {
+            if(data) {
+                try {
+                    const bewerkteHuurder = {
+                        HuurderID: data.id,
+                        Email: formulier.values.email || null,
+                        Naam: formulier.values.naam || null,
+                        Adres: formulier.values.adres || null,
+                        NieuwWachtwoord: formulier.values.nieuwWachtwoord || null,
+                        OudWachtwoord: formulier.values.oudWachtwoord || null,
+                        BedrijfsAdres: formulier.values.bedrijfsAdres || null,
+                        BedrijfsNaam: formulier.values.bedrijfsNaam || null,
+                        KVKNummer: formulier.values.kvkNummer || null,
+                        Rol: data.rol
+                    };
+            
+                    const resultaat = await fetchCsrf("http://localhost:5202/api/Profiel/EditHuurder", {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        credentials: "include",
+                        body: JSON.stringify(bewerkteHuurder),
+                    });
+            
+                    if (resultaat.ok) {
+                        alert("Medewerker bijgewerkt!");
+                        await getHuurder();
+                    } 
+                    else {
+                        alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+                    }
+                } catch (error) {
+                    console.error("Fout: ", error);
+                }
+            }
+        }
+    };
+    
 
     return (
         <div>
@@ -147,7 +194,7 @@ export function Profiel() {
                         />
                         <TextInput
                             label="KVK-nummer"
-                            placeholder={data?.kvkNummer}
+                            placeholder={String(data?.kvkNummer)}
                             mb="sm"
                             {...formulier.getInputProps("kvkNummer")}
                         />
@@ -169,7 +216,7 @@ export function Profiel() {
                 />
 
                 <Group justify="space-between" grow>
-                    <Button color="green" onClick={() => console.log()}>
+                    <Button color="green" onClick={() => handleBewerken()}>
                         Opslaan
                     </Button>
                     
