@@ -5,7 +5,7 @@ namespace CarAndAll.Server.Models
     public class Notitie
     {
         [Key]
-        public int NotitieID { get; set; }
+        public int NotitieId { get; set; }
 
         [Required, MaxLength(500)] // Meer ruimte voor langere notities
         public string Inhoud { get; set; }

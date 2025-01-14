@@ -5,7 +5,7 @@ namespace CarAndAll.Server.Models
     public class Bedrijf
     {
         [Key]
-        public int KvkNummer { get; set; }
+        public int KVKNummer { get; set; }
 
         [Required, MaxLength(255)]
         public string Naam { get; set; }

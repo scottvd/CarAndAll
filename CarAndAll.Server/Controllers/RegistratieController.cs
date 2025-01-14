@@ -53,7 +53,7 @@ public class RegistratieController : ControllerBase
 
                 var nieuwBedrijf = new Bedrijf
                 {
-                    KvkNummer = dto.Kvk.Value,
+                    KVKNummer = dto.Kvk.Value,
                     Naam = dto.BedrijfNaam,
                     Adres = dto.BedrijfAdres,
                     Huurders = new List<Huurder> { nieuweHuurder }
@@ -62,7 +62,7 @@ public class RegistratieController : ControllerBase
                 _context.Bedrijven.Add(nieuwBedrijf);
                 await _context.SaveChangesAsync();
 
-                nieuweHuurder.BedrijfId = nieuwBedrijf.KvkNummer;
+                nieuweHuurder.BedrijfId = nieuwBedrijf.KVKNummer;
                 _context.Huurders.Update(nieuweHuurder);
                 await _context.SaveChangesAsync();
             }

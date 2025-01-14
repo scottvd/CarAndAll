@@ -211,7 +211,7 @@ namespace CarAndAll.Server.Data
                 int i = -1;
                 foreach (var item in data)
                 {
-                    item.VoertuigID = i--;
+                    item.VoertuigId = i--;
                 }
 
                 context.Voertuigen.AddRange(data);

@@ -12,7 +12,7 @@ namespace CarAndAll.Server.Models
     public class Verhuuraanvraag
     {
         [Key]
-        public int AanvraagID { get; set; }
+        public int AanvraagId { get; set; }
 
         [Required]
         public DateTime OphaalDatum { get; set; }

@@ -11,10 +11,10 @@ namespace CarAndAll.Server.Models
     public class Schademelding
     {
         [Key]
-        public int SchademeldingID { get; set; }
+        public int SchademeldingId { get; set; }
 
         [Required, MaxLength(50)]
-        public SchadeStatus Status { get; set; } // Bijv. "Open", "In Behandeling", "Afgerond"
+        public SchadeStatus Status { get; set; }
 
         [Required]
         public DateTime Datum { get; set; }

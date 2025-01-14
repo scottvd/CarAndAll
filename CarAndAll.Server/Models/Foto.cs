@@ -5,7 +5,7 @@
         public class Foto
         {
             [Key]
-            public int FotoID { get; set; }
+            public int FotoId { get; set; }
 
             [Required, MaxLength(255)]
             public string Path { get; set; }

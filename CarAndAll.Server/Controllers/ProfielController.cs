@@ -57,7 +57,7 @@ namespace CarAndAll.Controllers
                                     gebruiker.Adres,
                                     bedrijfsNaam = bedrijf.Naam,
                                     bedrijfsAdres = bedrijf.Adres,
-                                    bedrijf.KvkNummer,
+                                    bedrijf.KVKNummer,
                                     Rol = rol
                                 };
 
@@ -134,8 +134,8 @@ namespace CarAndAll.Controllers
                             bedrijf.Naam = dto.BedrijfsNaam;
                         }
 
-                        if(dto.KVKNummer != null && bedrijf.KvkNummer != dto.KVKNummer) {
-                            bedrijf.KvkNummer = (int)dto.KVKNummer;
+                        if(dto.KVKNummer != null && bedrijf.KVKNummer != dto.KVKNummer) {
+                            bedrijf.KVKNummer = (int)dto.KVKNummer;
                         }
                     }
                 }

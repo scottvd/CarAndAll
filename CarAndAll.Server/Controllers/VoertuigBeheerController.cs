@@ -49,14 +49,14 @@ namespace CarAndAll.Server.Controllers
 
             _context.Voertuigen.Add(voertuig);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetVoertuig), new { Id = voertuig.VoertuigID }, voertuig);
+            return CreatedAtAction(nameof(GetVoertuig), new { Id = voertuig.VoertuigId }, voertuig);
         }
 
         [HttpPut("EditVoertuig/{id}")]
         [Authorize(Policy = "Medewerkers")]
         public async Task<IActionResult> EditVoertuig(int Id, [FromBody] Voertuig bewerkingen)
         {
-            if (bewerkingen == null || Id != bewerkingen.VoertuigID)
+            if (bewerkingen == null || Id != bewerkingen.VoertuigId)
             {
                 return BadRequest("Er is iets fout gegaan bij het bewerken van het voertuig. Probeer het opnieuw.");
             }

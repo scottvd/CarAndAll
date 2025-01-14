@@ -5,7 +5,7 @@ namespace CarAndAll.Server.Models
 {
     public class Voertuig {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int VoertuigID { get; set; }
+        public int VoertuigId { get; set; }
 
         [Required, MaxLength(10)]
         public string Kenteken { get; set; }
