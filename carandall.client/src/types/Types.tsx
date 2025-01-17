@@ -18,7 +18,7 @@ export type Medewerker = {
 };
 
 export type Voertuig = {
-  voertuigID: number;
+  voertuigId: number;
   kenteken: string;
   soort: string;
   merk: string;

@@ -6,7 +6,8 @@ namespace CarAndAll.Server.Models
     {
         InBehandeling,
         Geaccepteerd,
-        Afgewezen
+        Afgewezen,
+        Afgerond
     }
 
     public class Verhuuraanvraag

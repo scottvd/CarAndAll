@@ -11,12 +11,12 @@ namespace CarAndAll.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class HuurController : ControllerBase
+    public class VerhuuraanvraagController : ControllerBase
     {
         private readonly CarAndAllContext _context;
         private readonly IGebruikerIdService _gebruikerIdService;
 
-        public HuurController(CarAndAllContext context, IGebruikerIdService gebruikerIdService)
+        public VerhuuraanvraagController(CarAndAllContext context, IGebruikerIdService gebruikerIdService)
         {
             _context = context;
             _gebruikerIdService = gebruikerIdService;
@@ -44,7 +44,7 @@ namespace CarAndAll.Server.Controllers
             return Ok(resultaat);
         }
 
-        [HttpPost("DoeVerhuuraanvraag")]
+        [HttpPost("AddVerhuuraanvraag")]
         [Authorize(Policy = "Huurders")]
         public async Task<IActionResult> AddVerhuuraanvraag([FromBody] VerhuuraanvraagDTO verhuuraanvraagDTO) 
         {

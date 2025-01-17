@@ -16,7 +16,7 @@ export function Verhuuraanvragen() {
   useEffect(() => {
     const getVerhuuraanvragen = async () => {
       try {
-        const resultaat = await fetch('http://localhost:5202/api/Huur/GetVerhuuraanvragen', { credentials: 'include' });
+        const resultaat = await fetch('http://localhost:5202/api/Verhuuraanvraag/GetVerhuuraanvragen', { credentials: 'include' });
 
         if (!resultaat.ok) {
           throw new Error(`Foutmelding: ${resultaat.status}`);
@@ -36,10 +36,10 @@ export function Verhuuraanvragen() {
   }, []);
 
   const handleStatusChange = async (aanvraagID: number, status: string) => {
-    const dto = { aanvraagID, status };
+    const dto = { aanvraagID: aanvraagID, status };
 
     try {
-      const response = await fetchCsrf('http://localhost:5202/api/Huur/BehandelVerhuuraanvraag', {
+      const response = await fetchCsrf('http://localhost:5202/api/Verhuuraanvraag/BehandelVerhuuraanvraag', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

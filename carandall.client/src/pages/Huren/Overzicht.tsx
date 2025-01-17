@@ -14,7 +14,7 @@ export function Overzicht() {
   const [inleverDatum, setInleverDatum] = useState<Date | null>(null);
   const [data, setData] = useState<VoertuigMetPrijs[] | null>(null);
   const [gefilterdeData, setGefilterdeData] = useState<VoertuigMetPrijs[] | null>(null);
-  const [geselecteerdVoertuig, setSelectedVoertuig] = useState<VoertuigMetPrijs | null>(null);
+  const [geselecteerdVoertuig, setGeselecteerdVoertuig] = useState<VoertuigMetPrijs | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState<Filterwaarden>({
     zoekTerm: "",
@@ -63,7 +63,7 @@ export function Overzicht() {
         });
 
         const resultaat = await fetch(
-          `http://localhost:5202/api/Huur/GetVoertuigen?${parameters}`,
+          `http://localhost:5202/api/Verhuuraanvraag/GetVoertuigen?${parameters}`,
           {
             method: "GET",
             credentials: "include",
@@ -87,7 +87,8 @@ export function Overzicht() {
   };
 
   const handleVerhuuraanvraag = (voertuig: VoertuigMetPrijs) => {
-    setSelectedVoertuig(voertuig);
+    console.log(voertuig);
+    setGeselecteerdVoertuig(voertuig);
     setIsModalOpen(true);
   };
 
@@ -97,14 +98,18 @@ export function Overzicht() {
       return;
     }
 
+    console.log(geselecteerdVoertuig);
+
     const verhuuraanvraagData = {
-      VoertuigId: geselecteerdVoertuig.voertuigID,
+      VoertuigId: geselecteerdVoertuig.voertuigId,
       OphaalDatum: ophaalDatum.toISOString(),
       InleverDatum: inleverDatum.toISOString(),
     };
 
+    console.log(verhuuraanvraagData)
+
     try {
-      const resultaat = await fetchCsrf("http://localhost:5202/api/Huur/DoeVerhuuraanvraag", {
+      const resultaat = await fetchCsrf("http://localhost:5202/api/Verhuuraanvraag/AddVerhuuraanvraag", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +142,7 @@ export function Overzicht() {
   };
 
   const voertuigCards = (gefilterdeData || []).map((voertuig: VoertuigMetPrijs) => (
-    <Grid.Col span={6} key={voertuig.voertuigID}>
+    <Grid.Col span={6} key={voertuig.voertuigId}>
       <Card shadow="sm" padding="lg" radius="sm" withBorder>
         <Card.Section withBorder inheritPadding py="xs">
           <Group justify="space-between">

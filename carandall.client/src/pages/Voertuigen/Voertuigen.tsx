@@ -47,7 +47,7 @@ export function Voertuigen() {
   };
 
   const rows = data.map((voertuig) => (
-    <tr key={voertuig.voertuigID}>
+    <tr key={voertuig.voertuigId}>
       <td>{voertuig.kenteken}</td>
       <td>{voertuig.soort}</td>
       <td>{voertuig.merk}</td>
