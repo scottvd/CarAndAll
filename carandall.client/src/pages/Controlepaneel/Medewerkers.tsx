@@ -3,15 +3,7 @@ import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { useEffect, useState } from "react";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
-
-type Medewerker = {
-  id: string;
-  naam: string;
-  personeelsNummer: number;
-  email: string;
-  wachtwoord?: string;
-  rol: string;
-};
+import { Medewerker } from "../../types/Types";
 
 export function Medewerkers() {
   useAuthorisatie(["BackofficeMedewerker"]);

@@ -1,30 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DateInput } from "@mantine/dates";
-import { Button, Group, Grid, Card, Text, Modal } from "@mantine/core";
+import { Button, Group, Grid, Card, Text, Modal, TextInput, MultiSelect } from "@mantine/core";
 import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
-
-type Voertuig = {
-  voertuigID: number;
-  kenteken: string;
-  soort: string;
-  merk: string;
-  type: string;
-  aanschafjaar: number;
-  prijs: number;
-  verhuuraanvragen: Record<string, any> | null;
-  schademeldingen: Record<string, any> | null;
-};
+import { Prijs, Soort, VoertuigMetPrijs } from "../../types/Types";
+import { Filterwaarden } from "../../interfaces/interfaces";
 
 export function Overzicht() {
   useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);
 
   const [ophaalDatum, setOphaalDatum] = useState<Date | null>(null);
   const [inleverDatum, setInleverDatum] = useState<Date | null>(null);
-  const [data, setData] = useState<Voertuig[] | null>(null);
-  const [selectedVoertuig, setSelectedVoertuig] = useState<Voertuig | null>(null);
+  const [data, setData] = useState<VoertuigMetPrijs[] | null>(null);
+  const [gefilterdeData, setGefilterdeData] = useState<VoertuigMetPrijs[] | null>(null);
+  const [geselecteerdVoertuig, setSelectedVoertuig] = useState<VoertuigMetPrijs | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filters, setFilters] = useState<Filterwaarden>({
+    zoekTerm: "",
+    soort: [],
+    prijs: [],
+  });
+
+  const filterVoertuigen = (waarde: Filterwaarden) => {
+    if (!data) return [];
+    
+    const prijsKlasse: Record<string, [number, number]> = {
+      "< €50": [0, 49.99],
+      "€50 - €75": [50, 75],
+      "> €75": [75.01, Infinity],
+    };
+  
+    return data.filter((item) => {
+      const zoekTerm = waarde.zoekTerm.toUpperCase();
+      const merkEnTypeFilter = (item.merk?.toUpperCase().includes(zoekTerm) || 
+                           item.type?.toUpperCase().includes(zoekTerm));
+      const soortFilter = waarde.soort.length > 0 
+        ? waarde.soort.map((s) => s.toUpperCase()).includes(item.soort.toUpperCase() as Soort) 
+        : true;
+      const prijsKlasseFilter = waarde.prijs.length > 0 
+        ? waarde.prijs.some((radius) => {
+            const [min, max] = prijsKlasse[radius];
+            return item.prijs >= min && item.prijs <= max;
+          })
+        : true;
+  
+      return merkEnTypeFilter && soortFilter && prijsKlasseFilter;
+    });
+  };
+  
+
+  useEffect(() => {
+    setGefilterdeData(filterVoertuigen(filters));
+  }, [filters, data]);
 
   const getVoertuigen = async () => {
     try {
@@ -46,31 +74,31 @@ export function Overzicht() {
         );
 
         if (!resultaat.ok) {
-          console.log(new Error(`Foutmelding: ${resultaat.status}`));
           throw new Error(`Foutmelding: ${resultaat.status}`);
         }
 
         const data = await resultaat.json();
         setData(data);
+        setGefilterdeData(filterVoertuigen(filters));
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleVerhuuraanvraag = (voertuig: Voertuig) => {
+  const handleVerhuuraanvraag = (voertuig: VoertuigMetPrijs) => {
     setSelectedVoertuig(voertuig);
     setIsModalOpen(true);
   };
 
-  const confirmAanvraag = async () => {
-    if (!selectedVoertuig || !ophaalDatum || !inleverDatum) {
+  const bevestigAanvraag = async () => {
+    if (!geselecteerdVoertuig || !ophaalDatum || !inleverDatum) {
       alert("De data om uw verhuuraanvraag te doen is incompleet, probeer het opnieuw.");
       return;
     }
 
     const verhuuraanvraagData = {
-      VoertuigId: selectedVoertuig.voertuigID,
+      VoertuigId: geselecteerdVoertuig.voertuigID,
       OphaalDatum: ophaalDatum.toISOString(),
       InleverDatum: inleverDatum.toISOString(),
     };
@@ -97,64 +125,62 @@ export function Overzicht() {
     setIsModalOpen(false);
   };
 
-  const voertuigCards = data
-    ? data.map((voertuig) => (
-        <Grid.Col span={6} key={voertuig.voertuigID}>
-          <Card shadow="sm" padding="lg" radius="sm" withBorder>
-            <Card.Section withBorder inheritPadding py="xs">
-              <Group justify="space-between">
-                <Text fw={500}>
-                  {voertuig.merk} {voertuig.type}
-                </Text>
-                <Text>€{voertuig.prijs} /dag</Text>
-              </Group>
-            </Card.Section>
-
-            <Card.Section inheritPadding py="xs">
-              <Text>
-                <Text span>Soort:</Text> {voertuig.soort}
-              </Text>
-              <Text>
-                <Text span>Aanschafjaar:</Text> {voertuig.aanschafjaar}
-              </Text>
-              <Text>
-                <Text span>Kenteken:</Text> {voertuig.kenteken}
-              </Text>
-            </Card.Section>
-
-            <Button onClick={() => handleVerhuuraanvraag(voertuig)}>
-              Verhuuraanvraag indienen
-            </Button>
-          </Card>
-        </Grid.Col>
-      ))
-    : null;
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const calculateSubtotal = (startDate: Date | null, endDate: Date | null, pricePerDay: number) => {
-    if (startDate && endDate) {
+  const berekenSubtotaal = (ophaalDatum: Date | null, inleverDatum: Date | null, dagPrijs: number) => {
+    if (ophaalDatum && inleverDatum) {
       const days = Math.max(
         1,
-        Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+        Math.ceil((inleverDatum.getTime() - ophaalDatum.getTime()) / (1000 * 60 * 60 * 24)) + 1
       );
-      return (days * pricePerDay).toFixed(2);
+      return (days * dagPrijs).toFixed(2);
     }
     return "0.00";
   };
 
+  const voertuigCards = (gefilterdeData || []).map((voertuig: VoertuigMetPrijs) => (
+    <Grid.Col span={6} key={voertuig.voertuigID}>
+      <Card shadow="sm" padding="lg" radius="sm" withBorder>
+        <Card.Section withBorder inheritPadding py="xs">
+          <Group justify="space-between">
+            <Text fw={500}>
+              {voertuig.merk} {voertuig.type}
+            </Text>
+            <Text>€{voertuig.prijs} /dag</Text>
+          </Group>
+        </Card.Section>
+
+        <Card.Section inheritPadding py="xs">
+          <Text>
+            <Text span>Soort:</Text> {voertuig.soort}
+          </Text>
+          <Text>
+            <Text span>Aanschafjaar:</Text> {voertuig.aanschafjaar}
+          </Text>
+          <Text>
+            <Text span>Kenteken:</Text> {voertuig.kenteken}
+          </Text>
+        </Card.Section>
+
+        <Button onClick={() => handleVerhuuraanvraag(voertuig)}>
+          Verhuuraanvraag indienen
+        </Button>
+      </Card>
+    </Grid.Col>
+  ));
+
+  const datumVanMorgen = new Date();
+  datumVanMorgen.setDate(datumVanMorgen.getDate() + 1);
+
   return (
     <div>
       <h2>Huren</h2>
-      <p>Wanneer wilt u een voertuig huren?</p>
+
       <Group>
         <DateInput
           value={ophaalDatum}
           onChange={setOphaalDatum}
           label="Ophaaldatum"
           placeholder="Klik hier om een ophaaldatum te kiezen"
-          minDate={tomorrow}
+          minDate={datumVanMorgen}
           maxDate={inleverDatum || undefined}
         />
         <DateInput
@@ -162,60 +188,49 @@ export function Overzicht() {
           onChange={setInleverDatum}
           label="Inleverdatum"
           placeholder="Klik hier om een inleverdatum te kiezen"
-          minDate={ophaalDatum || tomorrow}
+          minDate={ophaalDatum || datumVanMorgen}
         />
         <Button onClick={getVoertuigen}>Voertuigen weergeven</Button>
       </Group>
 
-      <Grid gutter="md">{voertuigCards}</Grid>
+      <Group>
+        <TextInput
+          value={filters.zoekTerm}
+          onChange={(event) =>
+            setFilters({ ...filters, zoekTerm: event.currentTarget.value })
+          }
+          label="Zoekterm"
+          placeholder="Voer een merk in"
+        />
 
-      <Modal
-        opened={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Bevestig uw verhuuraanvraag"
-      >
-        {selectedVoertuig && (
-          <div>
-            <Text>
-              <strong>
-                {selectedVoertuig.merk} {selectedVoertuig.type}
-              </strong>
-            </Text>
-            <Text>
-              Huurperiode:{" "}
-              <strong>{ophaalDatum?.toLocaleDateString()}</strong>
-              {" "}tot{" "}
-              <strong>{inleverDatum?.toLocaleDateString()}</strong>
-            </Text>
+        <MultiSelect
+          label="Soort"
+          placeholder="Selecteer een soort"
+          data={["Auto", "Camper", "Caravan"]}
+          value={filters.soort}
+          onChange={(value) => setFilters({ ...filters, soort: value as Soort[] })}
+        />
 
-            {ophaalDatum && inleverDatum && (
-              <Text>
-                <strong>Subtotaal:</strong> huurprijs van €{selectedVoertuig.prijs.toFixed(2)} per dag over een
-                periode van{" "}
-                {Math.max(
-                  1,
-                  Math.ceil(
-                    (inleverDatum.getTime() - ophaalDatum.getTime()) /
-                      (1000 * 60 * 60 * 24)
-                  ) + 1
-                )}{" "}
-                dagen:{" "}
-                <strong>
-                  €{calculateSubtotal(ophaalDatum, inleverDatum, selectedVoertuig.prijs)}
-                </strong>
-              </Text>
-            )}
+        <MultiSelect
+          label="Prijsklasse"
+          placeholder="Selecteer een prijsklasse"
+          data={["< €50", "€50 - €75", "> €75"]}
+          value={filters.prijs}
+          onChange={(value) => setFilters({ ...filters, prijs: value as Prijs[] })}
+        />
+      </Group>
 
-            <Group justify="space-between" mt="md">
-              <Button color="red" variant="outline" onClick={() => setIsModalOpen(false)}>
-                Annuleren
-              </Button>
-              <Button color="green" onClick={confirmAanvraag}>
-                Bevestigen
-              </Button>
-            </Group>
-          </div>
-        )}
+      <Grid mt="md">{voertuigCards}</Grid>
+
+      <Modal opened={isModalOpen} onClose={() => setIsModalOpen(false)} title="Verhuuraanvraag">
+        <p>
+          {geselecteerdVoertuig?.merk} {geselecteerdVoertuig?.type} ({geselecteerdVoertuig?.soort})
+        </p>
+        <p>
+          Subtotaal: €{" "}
+          {berekenSubtotaal(ophaalDatum, inleverDatum, geselecteerdVoertuig?.prijs ?? 0)}
+        </p>
+        <Button onClick={bevestigAanvraag}>Bevestigen</Button>
       </Modal>
     </div>
   );

@@ -4,17 +4,7 @@ import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
 import { Button, Group, PasswordInput, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
-
-type Huurder = {
-    id: string;
-    naam: string;
-    email: string;
-    adres: string;
-    rol: string;
-    bedrijfsAdres?: string;
-    bedrijfsNaam?: string;
-    kvkNummer?: number;
-};
+import { Huurder } from "../../types/Types";
 
 export function Profiel() {
     useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);

@@ -4,16 +4,7 @@ import '../../styles/table.css';
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { fetchCsrf } from "../../utilities/fetchCsrf";
-
-type Verhuuraanvraag = {
-  verhuuraanvraagID: number;
-  voertuig: string;
-  kenteken: string;
-  huurder: string;
-  ophaaldatum: string;
-  inleverdatum: string;
-  status: string;
-};
+import { Verhuuraanvraag } from "../../types/Types";
 
 export function Verhuuraanvragen() {
   useAuthorisatie(["BackofficeMedewerker"]);

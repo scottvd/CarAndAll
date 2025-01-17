@@ -4,17 +4,10 @@ import { useNavigate } from "react-router-dom";
 import '../../styles/table.css';
 import { IconSearch } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
+import { Voertuig } from "../../types/Types";
 
-type Voertuig = {
-  voertuigID: number;
-  kenteken: string;
-  soort: string;
-  merk: string;
-  type: string;
-  aanschafjaar: number;
-  verhuuraanvragen: Record<string, any> | null;
-  schademeldingen: Record<string, any> | null;
-};
+
+
 
 export function Voertuigen() {
   useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
