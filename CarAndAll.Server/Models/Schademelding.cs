@@ -2,22 +2,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CarAndAll.Server.Models
 {
-    public enum SchadeStatus
-    {
-        Open,
-        InBehandeling,
-        Afgerond
-    }
     public class Schademelding
     {
         [Key]
         public int SchademeldingId { get; set; }
 
-        [Required, MaxLength(50)]
-        public SchadeStatus Status { get; set; }
-
         [Required]
         public DateTime Datum { get; set; }
+
+        [Required]
+        public int HerstelPeriode { get; set; }
 
         [Required, MaxLength(500)]
         public string Beschrijving { get; set; }
