@@ -23,20 +23,26 @@ namespace CarAndAll.Server.Controllers
         }
 
         [HttpGet("GetVoertuigen")]
-        public async Task<IActionResult> GetVoertuigen([FromQuery] DateTime ophaalDatum, [FromQuery] DateTime inleverDatum) 
+        public async Task<IActionResult> GetVoertuigen([FromQuery] DateTime ophaalDatum, [FromQuery] DateTime inleverDatum)
         {
-            if (ophaalDatum == DateTime.MinValue || inleverDatum == DateTime.MinValue) 
+            if (ophaalDatum == DateTime.MinValue || inleverDatum == DateTime.MinValue)
             {
                 return BadRequest("Vul een ophaal- en inleverdatum in.");
             }
-            
+
             var resultaat = await _context.Voertuigen
                 .Where(voertuig =>
-                    voertuig.Verhuuraanvragen.Any() ||
                     !voertuig.Verhuuraanvragen.Any(v =>
                         (ophaalDatum >= v.OphaalDatum && ophaalDatum <= v.InleverDatum) ||
                         (inleverDatum >= v.OphaalDatum && inleverDatum <= v.InleverDatum) ||
                         (ophaalDatum <= v.OphaalDatum && inleverDatum >= v.InleverDatum)
+                    )
+                )
+                .Where(voertuig =>
+                    !_context.Schademeldingen.Any(schade =>
+                        schade.VoertuigId == voertuig.VoertuigId &&
+                        ophaalDatum <= schade.Datum.AddDays(schade.HerstelPeriode) &&
+                        inleverDatum >= schade.Datum
                     )
                 )
                 .ToListAsync();
