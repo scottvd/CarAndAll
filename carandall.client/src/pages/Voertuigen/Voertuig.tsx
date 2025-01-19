@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 
 export function Voertuig() {
@@ -19,43 +19,56 @@ export function Voertuig() {
     });
 
     const verwijderVoertuig = async () => {
-        try {
-            const resultaat = await fetchCsrf(`http://localhost:5202/api/VoertuigBeheer/DeleteVoertuig/${voertuig.voertuigID}`, { 
-                method: 'DELETE',
-                credentials: 'include' 
-            });
-    
-            if (!resultaat.ok) {
-              throw new Error(`Foutmelding: ${resultaat.status}`);
-            }
+        const csrfToken = getCsrfToken();
 
-            alert("Voertuig succesvol verwijderd!");
-          } catch (error) {
+        if(csrfToken) {
+            try {
+                const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/DeleteVoertuig/${voertuig.voertuigId}`, { 
+                    method: "DELETE",
+                    headers: {
+                        "X-CSRF-Token": csrfToken
+                    },
+                    credentials: "include"
+                });
+        
+                if (!resultaat.ok) {
+                throw new Error(`Foutmelding: ${resultaat.status}`);
+                }
+
+                alert("Voertuig succesvol verwijderd!");
+            } catch (error) {
             console.error(error);
-          }
+            }
+        }
     };
 
     const updateVoertuig = async () => {
-        try {
-            const voertuigGegevens = { ...editedVoertuig, voertuigID: voertuig.voertuigID };
+        const csrfToken = getCsrfToken();
 
-            const resultaat = await fetchCsrf(`http://localhost:5202/api/VoertuigBeheer/EditVoertuig/${voertuig.voertuigID}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",
-                body: JSON.stringify(voertuigGegevens)
-            });
+        console.log(voertuig);
+        if(csrfToken) {
+            try {
+                const voertuigGegevens = { ...editedVoertuig, voertuigID: voertuig.voertuigId };
 
-            if (!resultaat.ok) {
-                throw new Error(`Foutmelding: ${resultaat.status}`);
+                const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/EditVoertuig/${voertuig.voertuigId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(voertuigGegevens)
+                });
+
+                if (!resultaat.ok) {
+                    throw new Error(`Foutmelding: ${resultaat.status}`);
+                }
+
+                alert("Voertuig succesvol bijgewerkt!");
+                setEditModus(false);
+            } catch (error) {
+                console.error(error);
             }
-
-            alert("Voertuig succesvol bijgewerkt!");
-            setEditModus(false);
-        } catch (error) {
-            console.error(error);
         }
     };
 

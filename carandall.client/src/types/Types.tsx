@@ -47,3 +47,10 @@ export type Huurder = {
 export type Soort = "Auto" | "Camper" | "Caravan";
 
 export type Prijs = "< €50" | "€50 - €75" | "> €75";
+
+export type VerhuuraanvraagAfhandelen = {
+    verhuuraanvraagId: number,
+    inleverDatum: Date,
+    huurder: string,
+    voertuig: string
+}

@@ -52,9 +52,12 @@ namespace CarAndAll.Server.Controllers
             {
                 return BadRequest("Er is iets fout gegaan tijdens het maken van uw verhuuraanvraag. Probeer het opnieuw!");
             }
-            
+
+            var ophaalDatumUTC = verhuuraanvraagDTO.OphaalDatum.ToUniversalTime();
+            var inleverDatumUTC = verhuuraanvraagDTO.InleverDatum.ToUniversalTime();
+
             var gewensteVoertuig = await _context.Voertuigen.FirstOrDefaultAsync(v => v.VoertuigId == verhuuraanvraagDTO.VoertuigId);
-            
+
             if (gewensteVoertuig == null) 
             {
                 return NotFound("Voertuig niet gevonden");
@@ -69,8 +72,8 @@ namespace CarAndAll.Server.Controllers
 
             var verhuuraanvraag = new Verhuuraanvraag 
             {
-                OphaalDatum = verhuuraanvraagDTO.OphaalDatum,
-                InleverDatum = verhuuraanvraagDTO.InleverDatum,
+                OphaalDatum = ophaalDatumUTC,
+                InleverDatum = inleverDatumUTC,
                 Status = AanvraagStatus.InBehandeling,
                 HuurderId = gebruikerId,
                 VoertuigId = gewensteVoertuig.VoertuigId
@@ -97,7 +100,7 @@ namespace CarAndAll.Server.Controllers
                 .Include(v => v.Huurder)
                 .Include(v => v.Voertuig)
                 .Select(v => new {
-                    verhuuraanvraagID = v.AanvraagId,
+                    verhuuraanvraagID = v.VerhuuraanvraagId,
                     voertuig = $"{v.Voertuig.Merk} {v.Voertuig.Type}",
                     kenteken = v.Voertuig.Kenteken,
                     huurder = v.Huurder.Naam,
@@ -118,7 +121,7 @@ namespace CarAndAll.Server.Controllers
             {
                 var aanvraag = await _context.Verhuuraanvragen
                     .Include(v => v.Voertuig)
-                    .FirstOrDefaultAsync(v => v.AanvraagId == behandelVerhuuraanvraagDTO.aanvraagID);
+                    .FirstAsync(v => v.VerhuuraanvraagId == behandelVerhuuraanvraagDTO.aanvraagID);
 
                 if (aanvraag == null)
                 {
@@ -144,7 +147,7 @@ namespace CarAndAll.Server.Controllers
                     var overlappendeAanvragen = await _context.Verhuuraanvragen
                         .Where(v =>
                             v.VoertuigId == aanvraag.VoertuigId &&
-                            v.AanvraagId != behandelVerhuuraanvraagDTO.aanvraagID &&
+                            v.VerhuuraanvraagId != behandelVerhuuraanvraagDTO.aanvraagID &&
                             v.Status == AanvraagStatus.InBehandeling &&
                             (
                                 (v.OphaalDatum >= aanvraag.OphaalDatum && v.OphaalDatum <= aanvraag.InleverDatum) ||

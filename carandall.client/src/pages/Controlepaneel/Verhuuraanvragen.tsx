@@ -3,7 +3,7 @@ import { Table, Button, TextInput, Group } from "@mantine/core";
 import '../../styles/table.css';
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Verhuuraanvraag } from "../../types/Types";
 
 export function Verhuuraanvragen() {
@@ -37,29 +37,33 @@ export function Verhuuraanvragen() {
 
   const handleStatusChange = async (aanvraagID: number, status: string) => {
     const dto = { aanvraagID: aanvraagID, status };
+    const csrfToken = getCsrfToken();
 
-    try {
-      const response = await fetchCsrf('http://localhost:5202/api/Verhuuraanvraag/BehandelVerhuuraanvraag', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(dto),
-      });
+    if(csrfToken) {
+      try {
+        const response = await fetch('http://localhost:5202/api/Verhuuraanvraag/BehandelVerhuuraanvraag', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+          },
+          credentials: 'include',
+          body: JSON.stringify(dto)
+        });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+
+        setOpenstaandeData((prev) => prev.filter((item) => item.verhuuraanvraagID !== aanvraagID));
+        setBehandeldeData((prev) => [
+          ...prev,
+          { ...openstaandeData.find((item) => item.verhuuraanvraagID === aanvraagID)!, status },
+        ]);
+
+      } catch (error) {
+        console.error(error);
       }
-
-      setOpenstaandeData((prev) => prev.filter((item) => item.verhuuraanvraagID !== aanvraagID));
-      setBehandeldeData((prev) => [
-        ...prev,
-        { ...openstaandeData.find((item) => item.verhuuraanvraagID === aanvraagID)!, status },
-      ]);
-
-    } catch (error) {
-      console.error(error);
     }
   };
 

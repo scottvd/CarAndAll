@@ -3,9 +3,10 @@ import { DateInput } from "@mantine/dates";
 import { Button, Group, Grid, Card, Text, Modal, TextInput, MultiSelect } from "@mantine/core";
 import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Prijs, Soort, VoertuigMetPrijs } from "../../types/Types";
 import { Filterwaarden } from "../../interfaces/interfaces";
+import { tijdzoneConverter } from "../../utilities/tijdzoneConverter";
 
 export function Overzicht() {
   useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);
@@ -58,8 +59,8 @@ export function Overzicht() {
     try {
       if (ophaalDatum && inleverDatum) {
         const parameters = new URLSearchParams({
-          ophaalDatum: ophaalDatum.toISOString(),
-          inleverDatum: inleverDatum.toISOString(),
+          ophaalDatum: tijdzoneConverter(ophaalDatum),
+          inleverDatum: tijdzoneConverter(inleverDatum),
         });
 
         const resultaat = await fetch(
@@ -98,33 +99,34 @@ export function Overzicht() {
       return;
     }
 
-    console.log(geselecteerdVoertuig);
-
     const verhuuraanvraagData = {
       VoertuigId: geselecteerdVoertuig.voertuigId,
-      OphaalDatum: ophaalDatum.toISOString(),
-      InleverDatum: inleverDatum.toISOString(),
+      OphaalDatum: tijdzoneConverter(ophaalDatum),
+      InleverDatum: tijdzoneConverter(inleverDatum),
     };
 
-    console.log(verhuuraanvraagData)
+    const csrfToken = getCsrfToken();
 
-    try {
-      const resultaat = await fetchCsrf("http://localhost:5202/api/Verhuuraanvraag/AddVerhuuraanvraag", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(verhuuraanvraagData),
-      });
+    if(csrfToken) {
+      try {
+        const resultaat = await fetch("http://localhost:5202/api/Verhuuraanvraag/AddVerhuuraanvraag", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+          },
+          credentials: "include",
+          body: JSON.stringify(verhuuraanvraagData),
+        });
 
-      if (resultaat.ok) {
-        alert("Uw verhuuraanvraag is opgenomen!");
-      } else {
-        alert("Er is iets fout gegaan tijdens het maken van uw aanvraag. Probeer het opnieuw!");
+        if (resultaat.ok) {
+          alert("Uw verhuuraanvraag is opgenomen!");
+        } else {
+          alert("Er is iets fout gegaan tijdens het maken van uw aanvraag. Probeer het opnieuw!");
+        }
+      } catch (error) {
+        console.error("Fout: ", error);
       }
-    } catch (error) {
-      console.error("Fout: ", error);
     }
 
     setIsModalOpen(false);

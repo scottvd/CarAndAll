@@ -2,7 +2,7 @@ import { Button, Checkbox, Group, Modal, PasswordInput, Table, TextInput } from 
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { useEffect, useState } from "react";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Medewerker } from "../../types/Types";
 
 export function Medewerkers() {
@@ -91,29 +91,33 @@ export function Medewerkers() {
   const handleToevoegen = async (event: React.FormEvent) => {
     event.preventDefault();
     const isValid = await createFormulier.validate();
+    const csrfToken = getCsrfToken();
 
     if (!isValid.hasErrors) {
-      try {
-        const { wachtwoordBevestiging, ...newData } = createFormulier.values;
+      if(csrfToken) {
+        try {
+          const { wachtwoordBevestiging, ...newData } = createFormulier.values;
 
-        const resultaat = await fetchCsrf("http://localhost:5202/api/Medewerker/AddMedewerker", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(newData),
-        });
+          const resultaat = await fetch("http://localhost:5202/api/Medewerker/AddMedewerker", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": csrfToken
+            },
+            credentials: "include",
+            body: JSON.stringify(newData)
+          });
 
-        if (resultaat.ok) {
-          alert("Medewerker toegevoegd!");
-          await getMedewerkers();
-          createFormulier.reset();
-        } else {
-          alert("Er is iets fout gegaan tijdens het toevoegen van de medewerker. Probeer het opnieuw!");
+          if (resultaat.ok) {
+            alert("Medewerker toegevoegd!");
+            await getMedewerkers();
+            createFormulier.reset();
+          } else {
+            alert("Er is iets fout gegaan tijdens het toevoegen van de medewerker. Probeer het opnieuw!");
+          }
+        } catch (error) {
+          console.error("Fout: ", error);
         }
-      } catch (error) {
-        console.error("Fout: ", error);
       }
     }
   };
@@ -132,60 +136,67 @@ export function Medewerkers() {
 
   const handleBewerken = async () => {
     const isValid = await editFormulier.validate();
+    const csrfToken = getCsrfToken();
 
     if (!isValid.hasErrors) {
-      try {
-        const { oudWachtwoord: wachtwoordBevestiging, ...updatedData } = editFormulier.values;
-        const bewerkteMedewerker = {...updatedData, medewerkerID: selectedMedewerker?.id}
+      if(csrfToken) {
+        try {
+          const { oudWachtwoord: wachtwoordBevestiging, ...updatedData } = editFormulier.values;
+          const bewerkteMedewerker = {...updatedData, medewerkerID: selectedMedewerker?.id}
 
-        console.log(bewerkteMedewerker);
+          const resultaat = await fetch("http://localhost:5202/api/Medewerker/EditMedewerker",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-Token": csrfToken
+              },
+              credentials: "include",
+              body: JSON.stringify(bewerkteMedewerker)
+            }
+          );
 
-        const resultaat = await fetchCsrf("http://localhost:5202/api/Medewerker/EditMedewerker",
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify(bewerkteMedewerker),
+          if (resultaat.ok) {
+            alert("Medewerker bijgewerkt!");
+            setIsModalOpen(false);
+            await getMedewerkers();
+          } else {
+            alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
           }
-        );
-
-        if (resultaat.ok) {
-          alert("Medewerker bijgewerkt!");
-          setIsModalOpen(false);
-          await getMedewerkers();
-        } else {
-          alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+        } catch (error) {
+          console.error("Fout: ", error);
         }
-      } catch (error) {
-        console.error("Fout: ", error);
       }
     }
   };
 
   const handleVerwijderen = async (id: string) => {
-    try {
-      const resultaat = await fetchCsrf("http://localhost:5202/api/Medewerker/DeleteMedewerker", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(id),
-      });
+    const csrfToken = getCsrfToken();
 
-      if (resultaat.ok) {
-        alert("Medewerker succesvol verwijderd!");
-        setIsModalOpen(false);
-        await getMedewerkers();
-      } else {
-        const errorMessage = await resultaat.text();
-        alert(`Er is iets fout gegaan: ${errorMessage}`);
+    if(csrfToken) {
+      try {
+        const resultaat = await fetch("http://localhost:5202/api/Medewerker/DeleteMedewerker", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken
+          },
+          credentials: "include",
+          body: JSON.stringify(id)
+        });
+
+        if (resultaat.ok) {
+          alert("Medewerker succesvol verwijderd!");
+          setIsModalOpen(false);
+          await getMedewerkers();
+        } else {
+          const errorMessage = await resultaat.text();
+          alert(`Er is iets fout gegaan: ${errorMessage}`);
+        }
+      } catch (error) {
+        console.error("Fout: ", error);
+        alert("Er is een fout opgetreden bij het verwijderen van de medewerker.");
       }
-    } catch (error) {
-      console.error("Fout: ", error);
-      alert("Er is een fout opgetreden bij het verwijderen van de medewerker.");
     }
   };
   

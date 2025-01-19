@@ -25,17 +25,20 @@ namespace CarAndAll.Server.Controllers
 
         [HttpGet("GetGeaccepteerdeVerhuuraanvragen")]
         [Authorize(Policy = "Medewerkers")]
-        public async Task<IActionResult> GetGeaccepteerdeVerhuuraanvragen([FromBody] DateTime datum) 
+        public async Task<IActionResult> GetGeaccepteerdeVerhuuraanvragen() 
         {
-            if (datum == DateTime.MinValue) 
-            {
-                return BadRequest("Er is geen datum bij het verzoek gevonden. Probeer het opnieuw.");
-            }
-            
-            var resultaat = await _context.Verhuuraanvragen.Where(
-                v => v.Status == AanvraagStatus.Geaccepteerd &&
-                v.InleverDatum == datum
-            ).ToListAsync();
+            var resultaat = await _context.Verhuuraanvragen
+                .Where(
+                    v => v.Status == AanvraagStatus.Geaccepteerd &&
+                    v.InleverDatum == DateTime.Today
+                )
+                .Select(v => new {
+                    v.VerhuuraanvraagId,
+                    v.InleverDatum,
+                    Huurder = v.Huurder.Naam,
+                    Voertuig = v.Voertuig.Merk + " " + v.Voertuig.Type
+                })
+                .ToListAsync();
 
             return Ok(resultaat);
         }
@@ -48,20 +51,55 @@ namespace CarAndAll.Server.Controllers
                 return BadRequest("Er is geen verhuuraanvraag bij uw opdracht meegegeven. Probeer het opnieuw.");
             }
 
+            var medewerkerId = _gebruikerIdService.GetGebruikerId();
+
+            if(medewerkerId.IsNullOrEmpty()) {
+                return Unauthorized("Geen ingelogte medewerker gevonden. Log in en probeer het opnieuw!");
+            }
+
             var verhuuraanvraag = await _context.Verhuuraanvragen.Where(
-                v => v.AanvraagId == dto.VerhuuraanvraagId
+                v => v.VerhuuraanvraagId == dto.VerhuuraanvraagId
             ).FirstAsync();
 
             if(verhuuraanvraag == null) {
                 return NotFound("Er is geen verhuuraanvraag met het meegegeven ID gevonden.");
             }
 
-            if(!dto.Beschrijving.IsNullOrEmpty() || dto.HerstelPeriode != 0) {
-                if(dto.HerstelPeriode != 0 && !dto.Beschrijving.IsNullOrEmpty()) {
-                    // Maak schademelding aan!!
-                }
+            verhuuraanvraag.Status = AanvraagStatus.Afgerond;
 
+            var voertuig = await _context.Voertuigen.Where(v => v.VoertuigId == verhuuraanvraag.VoertuigId).FirstAsync();
+
+            if(voertuig == null) {
+                return NotFound("Er is geen voertuig bij de aanvraag gevonden.");
+            }
+        
+            if (string.IsNullOrEmpty(dto.Beschrijving) ^ !dto.HerstelPeriode.HasValue)
+            {
                 return BadRequest("Bij het opstellen van een schadeformulier is het opgeven van een herstelperiode en beschrijving verplicht.");
+            }
+
+            if (!string.IsNullOrEmpty(dto.Beschrijving) && dto.HerstelPeriode.HasValue && dto.HerstelPeriode != 0)
+            {
+                var schademelding = new Schademelding
+                {
+                    Datum = DateTime.Today,
+                    HerstelPeriode = (int)dto.HerstelPeriode,
+                    Beschrijving = dto.Beschrijving,
+                    VoertuigId = voertuig.VoertuigId,
+                    VerhuuraanvraagId = verhuuraanvraag.VerhuuraanvraagId,
+                    MedewerkerId = medewerkerId
+                };
+
+                _context.Schademeldingen.Add(schademelding);
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(500, "Er is een probleem opgetreden bij het afhandelen van de verhuuraanvraag. Probeer het later opnieuw.");
             }
 
             return Ok();

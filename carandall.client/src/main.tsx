@@ -24,6 +24,7 @@ import { IncorrectRole } from "./pages/Static/IncorrectRole.tsx";
 import { Verhuuraanvragen } from "./pages/Controlepaneel/Verhuuraanvragen.tsx";
 import { Medewerkers } from "./pages/Controlepaneel/Medewerkers.tsx";
 import { Profiel } from "./pages/Profiel/Profiel.tsx";
+import { Afhandelen } from "./pages/Controlepaneel/Afhandelen.tsx";
 
 export const api = axios.create({
   baseURL: "https://localhost:7140",
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Medewerkers />},
           { path: "verhuuraanvragen", element: <Verhuuraanvragen /> },
+          { path: "afhandelen", element: <Afhandelen /> },
         ]
       }
     ]

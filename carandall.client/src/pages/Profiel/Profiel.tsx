@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Button, Group, PasswordInput, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { Huurder } from "../../types/Types";
@@ -99,66 +99,75 @@ export function Profiel() {
 
     const handleBewerken = async () => {
         const isValid = await formulier.validate();
+        const csrfToken = getCsrfToken();
+
     
         if (!isValid.hasErrors) {
-            if(data) {
-                try {
-                    const bewerkteHuurder = {
-                        HuurderID: data.id,
-                        Email: formulier.values.email || null,
-                        Naam: formulier.values.naam || null,
-                        Adres: formulier.values.adres || null,
-                        NieuwWachtwoord: formulier.values.nieuwWachtwoord || null,
-                        OudWachtwoord: formulier.values.oudWachtwoord || null,
-                        BedrijfsAdres: formulier.values.bedrijfsAdres || null,
-                        BedrijfsNaam: formulier.values.bedrijfsNaam || null,
-                        KVKNummer: formulier.values.kvkNummer || null,
-                        Rol: data.rol
-                    };
-            
-                    const resultaat = await fetchCsrf("http://localhost:5202/api/Profiel/EditHuurder", {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        credentials: "include",
-                        body: JSON.stringify(bewerkteHuurder),
-                    });
-            
-                    if (resultaat.ok) {
-                        alert("Medewerker bijgewerkt!");
-                        await getHuurder();
-                    } 
-                    else {
-                        alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+            if(csrfToken) {
+                if(data) {
+                    try {
+                        const bewerkteHuurder = {
+                            HuurderID: data.id,
+                            Email: formulier.values.email || null,
+                            Naam: formulier.values.naam || null,
+                            Adres: formulier.values.adres || null,
+                            NieuwWachtwoord: formulier.values.nieuwWachtwoord || null,
+                            OudWachtwoord: formulier.values.oudWachtwoord || null,
+                            BedrijfsAdres: formulier.values.bedrijfsAdres || null,
+                            BedrijfsNaam: formulier.values.bedrijfsNaam || null,
+                            KVKNummer: formulier.values.kvkNummer || null,
+                            Rol: data.rol
+                        };
+                
+                        const resultaat = await fetch("http://localhost:5202/api/Profiel/EditHuurder", {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-Token": csrfToken
+                            },
+                            credentials: "include",
+                            body: JSON.stringify(bewerkteHuurder)
+                        });
+                
+                        if (resultaat.ok) {
+                            alert("Medewerker bijgewerkt!");
+                            await getHuurder();
+                        } 
+                        else {
+                            alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+                        }
+                    } catch (error) {
+                        console.error("Fout: ", error);
                     }
-                } catch (error) {
-                    console.error("Fout: ", error);
                 }
             }
         }
     };
 
     const handleVerwijderingsverzoek = async () => {
-        if(data) {
-            try {        
-                const resultaat = await fetchCsrf("http://localhost:5202/api/Profiel/AddVerwijderingsverzoek", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                    body: JSON.stringify(data.id),
-                });
-        
-                if (resultaat.ok) {
-                    alert("Verwijderingsverzoek succesvol ingediend! Over 6 maanden worden uw gegevens definitied verwijderd.");
-                } 
-                else {
-                    alert("Er is iets fout gegaan tijdens het aanmaken van het verwijderingsverzoek. Probeer het opnieuw!");
+        const csrfToken = getCsrfToken();
+        if(csrfToken) {
+            if(data) {
+                try {        
+                    const resultaat = await fetch("http://localhost:5202/api/Profiel/AddVerwijderingsverzoek", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-Token": csrfToken
+                        },
+                        credentials: "include",
+                        body: JSON.stringify(data.id)
+                    });
+            
+                    if (resultaat.ok) {
+                        alert("Verwijderingsverzoek succesvol ingediend! Over 6 maanden worden uw gegevens definitied verwijderd.");
+                    } 
+                    else {
+                        alert("Er is iets fout gegaan tijdens het aanmaken van het verwijderingsverzoek. Probeer het opnieuw!");
+                    }
+                } catch (error) {
+                    console.error("Fout: ", error);
                 }
-            } catch (error) {
-                console.error("Fout: ", error);
             }
         }
     };

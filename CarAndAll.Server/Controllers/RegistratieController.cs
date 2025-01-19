@@ -3,82 +3,79 @@ using CarAndAll.Server.Data;
 using CarAndAll.Server.Models;
 using Microsoft.AspNetCore.Identity;
 
-[ApiController]
-[Route("api/[controller]")]
-public class RegistratieController : ControllerBase
+namespace CarAndAll.Controllers
 {
-    private readonly UserManager<Gebruiker> _userManager;
-    private readonly CarAndAllContext _context;
-
-    public RegistratieController(UserManager<Gebruiker> userManager, CarAndAllContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class RegistratieController : ControllerBase
     {
-        _userManager = userManager;
-        _context = context;
-    }
+        private readonly UserManager<Gebruiker> _userManager;
+        private readonly CarAndAllContext _context;
 
-    [HttpPost("Registreer")]
-    [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> Registreer([FromBody] RegistreerDTO dto)
-    {
-        if (!ModelState.IsValid)
+        public RegistratieController(UserManager<Gebruiker> userManager, CarAndAllContext context)
         {
-            return BadRequest(ModelState);
+            _userManager = userManager;
+            _context = context;
         }
 
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
+        [HttpPost("Registreer")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Registreer([FromBody] RegistreerDTO dto)
         {
-            var nieuweHuurder = new Huurder
+            if (!ModelState.IsValid)
             {
-                Email = dto.Email,
-                UserName = dto.Email,
-                Naam = dto.Naam,
-                Adres = dto.Adres,
-                Type = dto.Zakelijk ? HuurderType.Zakelijk : HuurderType.Particulier
-            };
-
-            var result = await _userManager.CreateAsync(nieuweHuurder, dto.Wachtwoord);
-
-            if (!result.Succeeded)
-            {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                return BadRequest(new { Errors = errors });
+                return BadRequest(ModelState);
             }
-            
-            await _userManager.AddToRoleAsync(nieuweHuurder, "Particulier");
 
-            if (dto.Zakelijk)
+            try
             {
-                await _userManager.AddToRoleAsync(nieuweHuurder, "Wagenparkbeheerder");
-
-                var nieuwBedrijf = new Bedrijf
+                var nieuweHuurder = new Huurder
                 {
-                    KVKNummer = dto.Kvk.Value,
-                    Naam = dto.BedrijfNaam,
-                    Adres = dto.BedrijfAdres,
-                    Huurders = new List<Huurder> { nieuweHuurder }
+                    Email = dto.Email,
+                    UserName = dto.Email,
+                    Naam = dto.Naam,
+                    Adres = dto.Adres,
+                    Type = dto.Zakelijk ? HuurderType.Zakelijk : HuurderType.Particulier
                 };
 
-                _context.Bedrijven.Add(nieuwBedrijf);
-                await _context.SaveChangesAsync();
+                var result = await _userManager.CreateAsync(nieuweHuurder, dto.Wachtwoord);
 
-                nieuweHuurder.BedrijfId = nieuwBedrijf.KVKNummer;
-                _context.Huurders.Update(nieuweHuurder);
-                await _context.SaveChangesAsync();
+                if (!result.Succeeded)
+                {
+                    var errors = result.Errors.Select(e => e.Description).ToList();
+                    return BadRequest(new { Errors = errors });
+                }
+
+                await _userManager.AddToRoleAsync(nieuweHuurder, "Particulier");
+
+                if (dto.Zakelijk)
+                {
+                    await _userManager.AddToRoleAsync(nieuweHuurder, "Wagenparkbeheerder");
+
+                    var nieuwBedrijf = new Bedrijf
+                    {
+                        KVKNummer = dto.Kvk.Value,
+                        Naam = dto.BedrijfNaam,
+                        Adres = dto.BedrijfAdres,
+                        Huurders = new List<Huurder> { nieuweHuurder }
+                    };
+
+                    _context.Bedrijven.Add(nieuwBedrijf);
+                    nieuweHuurder.BedrijfId = nieuwBedrijf.KVKNummer; // Set relationship directly.
+                }
+
+                await _context.SaveChangesAsync(); // Consolidate all changes into one call.
+
+                return Ok();
             }
-
-            await transaction.CommitAsync();
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-
-            return StatusCode(500, new
+            catch (Exception ex)
             {
-                Message = "Er is iets fout gegaan.",
-                Error = ex.Message,
-            });
+                return StatusCode(500, new
+                {
+                    Message = "Er is iets fout gegaan.",
+                    Error = ex.Message,
+                });
+            }
         }
-    }
+    }   
 }

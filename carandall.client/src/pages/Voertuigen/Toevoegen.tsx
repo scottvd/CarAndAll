@@ -1,5 +1,5 @@
 import React from "react";
-import { fetchCsrf } from "../../utilities/fetchCsrf";
+import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 
 export function Toevoegen() {
@@ -17,23 +17,28 @@ export function Toevoegen() {
             aanschafjaar: parseInt((formulier.elements.namedItem("aanschafjaar") as HTMLInputElement).value, 10),
         };
 
-        try {
-            const resultaat = await fetchCsrf("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify(voertuigData)
-            });
-            if (resultaat.ok) {
-                alert("Voertuig toegevoegd!");
-                formulier.reset();
-            } else {
-                alert("Er is iets fout gegaan tijdens het toevoegen van het voertuig. Probeer het opnieuw!");
+        const csrfToken = getCsrfToken();
+        
+        if(csrfToken) {
+            try {
+                const resultaat = await fetch("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(voertuigData)
+                });
+                if (resultaat.ok) {
+                    alert("Voertuig toegevoegd!");
+                    formulier.reset();
+                } else {
+                    alert("Er is iets fout gegaan tijdens het toevoegen van het voertuig. Probeer het opnieuw!");
+                }
+            } catch (error) {
+                console.error("Fout: ", error);
             }
-        } catch (error) {
-            console.error("Fout: ", error);
         }
     };
 
