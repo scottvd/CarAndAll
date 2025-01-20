@@ -1,15 +1,17 @@
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Identity;
-    using Microsoft.IdentityModel.Tokens;
-    using System.IdentityModel.Tokens.Jwt;
-    using System.Security.Claims;
-    using System.Text;
-    using System.Threading.Tasks;
-    using CarAndAll.Server.Models;
-    using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using System.Threading.Tasks;
+using CarAndAll.Server.Models;
+using System.Collections.Generic;
 using CarAndAll.Services;
 
-[ApiController]
+namespace CarAndAll.Controllers
+{
+    [ApiController]
     [Route("api/[controller]")]
     public class AuthenticatieController : ControllerBase
     {
@@ -17,7 +19,6 @@ using CarAndAll.Services;
         private readonly UserManager<Gebruiker> _userManager;
         private readonly IConfiguration _configuration;
         private readonly IGebruikerRollenService _gebruikerRollenService;
-
 
         public AuthenticatieController(SignInManager<Gebruiker> signInManager, UserManager<Gebruiker> userManager, IConfiguration configuration, IGebruikerRollenService gebruikerRollenService)
         {
@@ -41,6 +42,13 @@ using CarAndAll.Services;
             if (gebruiker == null)
             {
                 return Unauthorized(new { Message = "Geen gebruiker gevonden met deze gegevens." });
+            }
+
+            var wachtwoordResetDrempel = DateTime.UtcNow.Date.AddDays(-90);
+
+            if (gebruiker.WachtwoordBijgewerktDatum.Date <= wachtwoordResetDrempel.Date)
+            {
+                return Ok(new { Verlopen = true });
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(gebruiker, dto.Wachtwoord, false);
@@ -77,21 +85,70 @@ using CarAndAll.Services;
             return Ok(new { Message = "Inloggen geslaagd!" });
         }
 
+        [HttpPut("ResetWachtwoord")]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> ResetWachtwoord([FromBody] ResetWachtwoordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new { Message = "Foutmelding tijdens het resetten van uw wachtwoord: ", Errors = ModelState });
+            }
+
+            var gebruiker = await _userManager.FindByEmailAsync(dto.Email);
+
+            if (gebruiker == null)
+            {
+                return Unauthorized(new { Message = "Geen gebruiker gevonden met deze gegevens." });
+            }
+
+            if (dto.HuidigWachtwoord == dto.NieuwWachtwoord)
+            {
+                return Unauthorized(new { Message = "Het nieuwe wachtwoord mag niet gelijk zijn aan het oude wachtwoord!" });
+            }
+
+            var geldigHuidigWachtwoord = await _userManager.CheckPasswordAsync(gebruiker, dto.HuidigWachtwoord);
+            
+            if (!geldigHuidigWachtwoord)
+            {
+                return Unauthorized(new { Message = "Het huidige wachtwoord is niet correct." });
+            }
+
+            var result = await _userManager.ChangePasswordAsync(gebruiker, dto.HuidigWachtwoord, dto.NieuwWachtwoord);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { Message = "Foutmelding tijdens het wijzigen van het wachtwoord.", Errors = result.Errors });
+            }
+
+            gebruiker.WachtwoordBijgewerktDatum = DateTime.UtcNow.Date;
+
+            var updateResult = await _userManager.UpdateAsync(gebruiker);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(new { Message = "Foutmelding tijdens het opslaan van de wijziging van het wachtwoord." });
+            }
+
+            return Ok(new { Message = "Het wachtwoord is succesvol gewijzigd!" });
+        }
+
+
+
         [HttpPost("HeeftToestemming")]
         public bool HeeftToestemming([FromBody] string[]? rollen)
         {
             var gebruikerRollen = _gebruikerRollenService.GetGebruikerRollen();
-            
+
             if (gebruikerRollen != null)
             {
-                if(rollen == null || !rollen.Any()) {
+                if (rollen == null || !rollen.Any())
+                {
                     return true;
                 }
-                
+
                 try
                 {
                     var heeftToestemming = rollen.Any(rol => gebruikerRollen.Contains(rol, StringComparer.OrdinalIgnoreCase));
-                        
+
                     return heeftToestemming;
                 }
                 catch (Exception ex)
@@ -99,10 +156,9 @@ using CarAndAll.Services;
                     return false;
                 }
             }
-            
+
             return false;
         }
-
 
         private string GenerateJwtToken(Gebruiker gebruiker, IList<string> rollen)
         {
@@ -132,3 +188,4 @@ using CarAndAll.Services;
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
+}

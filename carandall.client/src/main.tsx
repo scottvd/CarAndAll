@@ -25,6 +25,7 @@ import { Profiel } from "./pages/Profiel/Profiel.tsx";
 import { Afhandelen } from "./pages/Controlepaneel/Afhandelen.tsx";
 import { NotificatieProvider } from "./utilities/NotificatieContext.tsx";
 import { LandingPagina } from "./pages/Dashboard/LandingPagina.tsx";
+import { ResetWachtwoord } from "./pages/Authenticatie/ResetWachtwoord.tsx";
 
 export const api = axios.create({
   baseURL: "https://localhost:7140",
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/reset-wachtwoord",
+    element: <ResetWachtwoord />,
   },
   {
     path: "/unauthorised",

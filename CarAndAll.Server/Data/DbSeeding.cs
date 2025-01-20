@@ -25,12 +25,10 @@ namespace CarAndAll.Server.Data
             }
 
             if(await userManager.FindByEmailAsync("scott@caa.nl") == null) {
-                Console.WriteLine("TEST 2");
-                var medewerker = new Medewerker { PersoneelsNummer = 001, Naam = "Scott", Email = "scott@caa.nl", UserName = "scott@caa.nl"};
+                var medewerker = new Medewerker { PersoneelsNummer = 001, Naam = "Scott", Email = "scott@caa.nl", UserName = "scott@caa.nl", WachtwoordBijgewerktDatum = DateTime.UtcNow.Date};
 
                 var result = await userManager.CreateAsync(medewerker, "Test123!");
                 if(result.Succeeded) {
-                    Console.WriteLine("TEST 3");
                     await userManager.AddToRolesAsync(medewerker, new List<string> { "BackofficeMedewerker", "FrontofficeMedewerker" });
                 }
 

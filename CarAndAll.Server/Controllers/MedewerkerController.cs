@@ -69,6 +69,7 @@ namespace CarAndAll.Server.Controllers
                         UserName = dto.Email,
                         Naam = dto.Naam,
                         PersoneelsNummer = dto.Personeelsnummer,
+                        WachtwoordBijgewerktDatum = DateTime.UtcNow.Date
                     };
 
                 var result = await _userManager.CreateAsync(medewerker, dto.Wachtwoord);

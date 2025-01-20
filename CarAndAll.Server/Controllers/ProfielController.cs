@@ -179,7 +179,7 @@ namespace CarAndAll.Controllers
 
             try {
                 var verwijderingsverzoek = new Verwijderingsverzoek {
-                    Datum = DateTime.Now,
+                    Datum = DateTime.UtcNow.Date,
                     Huurder = huurder
                 };
 

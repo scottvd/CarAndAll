@@ -35,7 +35,8 @@ namespace CarAndAll.Controllers
                     UserName = dto.Email,
                     Naam = dto.Naam,
                     Adres = dto.Adres,
-                    Type = dto.Zakelijk ? HuurderType.Zakelijk : HuurderType.Particulier
+                    Type = dto.Zakelijk ? HuurderType.Zakelijk : HuurderType.Particulier,
+                    WachtwoordBijgewerktDatum = DateTime.UtcNow.Date
                 };
 
                 var result = await _userManager.CreateAsync(nieuweHuurder, dto.Wachtwoord);

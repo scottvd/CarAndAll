@@ -42,9 +42,10 @@ export function Register() {
         value &&
         value.length >= 8 &&
         /[A-Z]/.test(value) &&
-        /\d/.test(value)
+        /\d/.test(value) &&
+        /[!@#$%^&*(),.?":{}|<>]/.test(value)
           ? null
-          : "Wachtwoord moet minimaal 8 tekens lang zijn, een hoofdletter en een cijfer bevatten",
+          : "Wachtwoord moet minimaal 8 tekens lang zijn, een hoofdletter, een cijfer en een leesteken bevatten",
       wachtwoordBevestiging: (value, values) =>
         value === values.wachtwoord
           ? null
