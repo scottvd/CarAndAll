@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { useNotificaties } from "../../utilities/NotificatieContext";
@@ -7,8 +7,9 @@ import { Button } from "@mantine/core";
 
 export function Voertuig() {
     useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
-    const { addNotificatie } = useNotificaties();   
+    const { addNotificatie } = useNotificaties();
     const location = useLocation();
+    const navigate = useNavigate();
     const { voertuig } = location.state || {};
 
     const [editModus, setEditModus] = useState(false);
@@ -23,23 +24,24 @@ export function Voertuig() {
     const verwijderVoertuig = async () => {
         const csrfToken = getCsrfToken();
 
-        if(csrfToken) {
+        if (csrfToken) {
             try {
-                const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/DeleteVoertuig/${voertuig.voertuigId}`, { 
-                    method: "DELETE",
+                const resultaat = await fetch(`http://localhost:5202/api/VoertuigBeheer/DeactiveerVoertuig/${voertuig.voertuigId}`, {
+                    method: "PUT",
                     headers: {
-                        "X-CSRF-Token": csrfToken
+                        "X-CSRF-Token": csrfToken,
                     },
-                    credentials: "include"
+                    credentials: "include",
                 });
-        
+
                 if (!resultaat.ok) {
-                throw new Error(`Foutmelding: ${resultaat.status}`);
+                    throw new Error(`Foutmelding: ${resultaat.status}`);
                 }
 
-                addNotificatie("Voertuig succesvol verwijderd!", "success", false);
+                addNotificatie("Voertuig succesvol gedeactiveerd!", "success", false);
+                navigate("/dashboard/voertuigen");
             } catch (error) {
-            console.error(error);
+                console.error(error);
             }
         }
     };
@@ -47,8 +49,7 @@ export function Voertuig() {
     const updateVoertuig = async () => {
         const csrfToken = getCsrfToken();
 
-        console.log(voertuig);
-        if(csrfToken) {
+        if (csrfToken) {
             try {
                 const voertuigGegevens = { ...editedVoertuig, voertuigID: voertuig.voertuigId };
 
@@ -56,18 +57,18 @@ export function Voertuig() {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        "X-CSRF-Token": csrfToken
+                        "X-CSRF-Token": csrfToken,
                     },
                     credentials: "include",
-                    body: JSON.stringify(voertuigGegevens)
+                    body: JSON.stringify(voertuigGegevens),
                 });
 
                 if (!resultaat.ok) {
                     throw new Error(`Foutmelding: ${resultaat.status}`);
                 }
 
-                addNotificatie("Voertuig succesvol bijgewerkt!", "success", true);
-                setEditModus(false);
+                addNotificatie("Voertuig succesvol bijgewerkt!", "success", true);                
+                navigate("/dashboard/voertuigen");
             } catch (error) {
                 console.error(error);
             }
@@ -114,7 +115,7 @@ export function Voertuig() {
                 ) : (
                     <>
                         <Button color="#2E8540" mr="1rem" className="edit-button" onClick={() => setEditModus(true)}>Bewerken</Button>
-                        <Button color="#E31C3D" className="delete-button" onClick={verwijderVoertuig}>Verwijder</Button>
+                        <Button color="#E31C3D" className="delete-button" onClick={verwijderVoertuig}>Deactiveren</Button>
                     </>
                 )}
             </div>

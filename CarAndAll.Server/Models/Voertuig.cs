@@ -26,8 +26,15 @@ namespace CarAndAll.Server.Models
         [Required]
         public decimal Prijs { get; set; }
 
+        [Required]
+        public bool IsActief { get; set; }
+
         public List<Verhuuraanvraag>? Verhuuraanvragen { get; set; }
 
         public List<Schademelding>? Schademeldingen { get; set; }
+
+        public Voertuig() {
+            IsActief = true;
+        }
     }
 }

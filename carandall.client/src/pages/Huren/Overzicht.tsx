@@ -122,6 +122,7 @@ export function Overzicht() {
 
         if (resultaat.ok) {
           addNotificatie("Uw verhuuraanvraag is opgenomen!", "success", false);
+          await getVoertuigen();
         } else {
           addNotificatie("Er is iets fout gegaan tijdens het maken van uw aanvraag. Probeer het opnieuw!", "error", true);
         }

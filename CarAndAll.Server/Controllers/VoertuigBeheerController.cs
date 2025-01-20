@@ -22,7 +22,7 @@ namespace CarAndAll.Server.Controllers
         [HttpGet("GetAllVoertuigen")]
         public async Task<IActionResult> GetAllVoertuigen()
         {
-            var voertuigen = await _context.Voertuigen.ToListAsync();
+            var voertuigen = await _context.Voertuigen.Where(v => v.IsActief == true).ToListAsync();
             return Ok(voertuigen);
         }
 
@@ -102,9 +102,9 @@ namespace CarAndAll.Server.Controllers
             return Ok("Voertuig succesvol bijgewerkt.");
         }
 
-        [HttpDelete("DeleteVoertuig/{id}")]
+        [HttpPut("DeactiveerVoertuig/{id}")]
         [Authorize(Policy = "Medewerkers")]
-        public async Task<IActionResult> DeleteVoertuig(int Id)
+        public async Task<IActionResult> DeactiveerVoertuig(int Id)
         {
             var voertuig = await _context.Voertuigen.FindAsync(Id);
             if (voertuig == null)
@@ -112,9 +112,10 @@ namespace CarAndAll.Server.Controllers
                 return NotFound("Voertuig niet gevonden.");
             }
 
-            _context.Voertuigen.Remove(voertuig);
+            voertuig.IsActief = false;
+
             await _context.SaveChangesAsync();
-            return Ok("Voertuig succesvol verwijderd!");
+            return Ok("Voertuig succesvol op non-actief gezet!");
         }
     }
 }

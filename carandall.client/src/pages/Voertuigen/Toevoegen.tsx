@@ -4,10 +4,12 @@ import { useForm } from "@mantine/form";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { useNotificaties } from "../../utilities/NotificatieContext";
+import { useNavigate } from "react-router-dom";
 
 export function Toevoegen() {
   useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
   const { addNotificatie } = useNotificaties();
+  const navigate = useNavigate();
 
   const form = useForm({
     initialValues: {
@@ -45,8 +47,9 @@ export function Toevoegen() {
         });
 
         if (resultaat.ok) {
+          const newVoertuig = await resultaat.json();
           addNotificatie("Voertuig toegevoegd!", "success", false);
-          form.reset();
+          navigate("/dashboard/voertuigen/voertuig", { state: { voertuig: newVoertuig } });
         } else {
           addNotificatie(
             "Er is iets fout gegaan tijdens het toevoegen van het voertuig. Probeer het opnieuw!",
@@ -62,50 +65,52 @@ export function Toevoegen() {
 
   return (
     <div>
-        <h1>Voertuig toevoegen</h1>
-        
-        <form onSubmit={form.onSubmit(voertuigToevoegen)}>
-            <TextInput
-                label="Kenteken"
-                placeholder="Vul het kenteken in"
-                {...form.getInputProps("kenteken")}
-                required
-            />
+      <h1>Voertuig toevoegen</h1>
 
-            <TextInput
-                label="Soort"
-                placeholder="Voer het soort voertuig in"
-                {...form.getInputProps("soort")}
-                required
-            />
+      <form onSubmit={form.onSubmit(voertuigToevoegen)}>
+        <TextInput
+          label="Kenteken"
+          placeholder="Vul het kenteken in"
+          {...form.getInputProps("kenteken")}
+          required
+        />
 
-            <TextInput
-                label="Merk"
-                placeholder="Voer het merk in"
-                {...form.getInputProps("merk")}
-                required
-            />
+        <TextInput
+          label="Soort"
+          placeholder="Voer het soort voertuig in"
+          {...form.getInputProps("soort")}
+          required
+        />
 
-            <TextInput
-                label="Type"
-                placeholder="Voer het type voertuig in"
-                {...form.getInputProps("type")}
-                required
-            />
+        <TextInput
+          label="Merk"
+          placeholder="Voer het merk in"
+          {...form.getInputProps("merk")}
+          required
+        />
 
-            <NumberInput
-                label="Aanschafjaar"
-                placeholder="Voer het aanschafjaar in"
-                min={1900}
-                max={new Date().getFullYear()}
-                {...form.getInputProps("aanschafjaar")}
-                required
-            />
+        <TextInput
+          label="Type"
+          placeholder="Voer het type voertuig in"
+          {...form.getInputProps("type")}
+          required
+        />
 
-            <Group mt="md">
-                <Button color="#2E8540" type="submit">Toevoegen</Button>
-            </Group>
-        </form>
+        <NumberInput
+          label="Aanschafjaar"
+          placeholder="Voer het aanschafjaar in"
+          min={1900}
+          max={new Date().getFullYear()}
+          {...form.getInputProps("aanschafjaar")}
+          required
+        />
+
+        <Group mt="md">
+          <Button color="#2E8540" type="submit">
+            Toevoegen
+          </Button>
+        </Group>
+      </form>
     </div>
   );
 }

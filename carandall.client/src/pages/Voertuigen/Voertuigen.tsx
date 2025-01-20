@@ -34,7 +34,7 @@ export function Voertuigen() {
 
   if (!data) return <div><p>De pagina is aan het laden. Een ogenblik geduld, alstublieft...</p></div>;
 
-  const huren = (voertuig: Voertuig) => {
+  const bewerken = (voertuig: Voertuig) => {
     navigate("/dashboard/voertuigen/voertuig", { state: { voertuig } });
   };
 
@@ -52,7 +52,7 @@ export function Voertuigen() {
       <td>{voertuig.aanschafjaar}</td>
       <td className="button">
         <Button 
-          aria-label={`Bewerk de ${voertuig.soort} ${voertuig.merk} ${voertuig.type} met kenteken ${voertuig.kenteken} en aanschafjaar ${voertuig.aanschafjaar}`} color="#28282B" onClick={() => huren(voertuig)}
+          aria-label={`Bewerk de ${voertuig.soort} ${voertuig.merk} ${voertuig.type} met kenteken ${voertuig.kenteken} en aanschafjaar ${voertuig.aanschafjaar}`} color="#28282B" onClick={() => bewerken(voertuig)}
         >
           Bewerken
         </Button>
