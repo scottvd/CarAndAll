@@ -76,6 +76,17 @@ namespace CarAndAll.Server.Controllers
                 return Unauthorized("Er is geen ingelogde gebruiker gevonden, log in en probeer het opnieuw");
             }
 
+            var overlappendeAanvragen = await _context.Verhuuraanvragen
+                .Where(v => v.VoertuigId == verhuuraanvraagDTO.VoertuigId 
+                            && (v.Status == AanvraagStatus.InBehandeling || v.Status == AanvraagStatus.Geaccepteerd)
+                            && ophaalDatumUTC.Date < v.InleverDatum.Date && inleverDatumUTC.Date > v.OphaalDatum.Date) 
+                .ToListAsync();
+
+            if (overlappendeAanvragen.Any()) 
+            {
+                return BadRequest("Er is al een verhuuraanvraag voor dit voertuig binnen de opgegeven periode.");
+            }
+
             var verhuuraanvraag = new Verhuuraanvraag 
             {
                 OphaalDatum = ophaalDatumUTC,
@@ -97,6 +108,7 @@ namespace CarAndAll.Server.Controllers
 
             return Ok("Verhuuraanvraag succesvol ingediend!");
         }
+
 
         [HttpGet("GetVerhuuraanvragen")]
         [Authorize(Policy = "BackofficeMedewerker")]
