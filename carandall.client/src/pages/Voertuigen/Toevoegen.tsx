@@ -1,80 +1,111 @@
 import React from "react";
+import { TextInput, NumberInput, Button, Group } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Toevoegen() {
-    useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
-    
-    const voertuigToevoegen = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+  useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
+  const { addNotificatie } = useNotificaties();
 
-        const formulier = e.currentTarget;
-        const voertuigData = {
-            kenteken: (formulier.elements.namedItem("kenteken") as HTMLInputElement).value,
-            soort: (formulier.elements.namedItem("soort") as HTMLInputElement).value,
-            merk: (formulier.elements.namedItem("merk") as HTMLInputElement).value,
-            type: (formulier.elements.namedItem("type") as HTMLInputElement).value,
-            aanschafjaar: parseInt((formulier.elements.namedItem("aanschafjaar") as HTMLInputElement).value, 10),
-        };
+  const form = useForm({
+    initialValues: {
+      kenteken: "",
+      soort: "",
+      merk: "",
+      type: "",
+      aanschafjaar: undefined,
+    },
+    validate: {
+      kenteken: (value) => (value.trim().length === 0 ? "Kenteken is verplicht" : null),
+      soort: (value) => (value.trim().length === 0 ? "Soort is verplicht" : null),
+      merk: (value) => (value.trim().length === 0 ? "Merk is verplicht" : null),
+      type: (value) => (value.trim().length === 0 ? "Type is verplicht" : null),
+      aanschafjaar: (value) =>
+        value && (value < 1900 || value > new Date().getFullYear())
+          ? `Aanschafjaar moet tussen 1900 en ${new Date().getFullYear()} liggen`
+          : null,
+    },
+  });
 
-        const csrfToken = getCsrfToken();
-        
-        if(csrfToken) {
-            try {
-                const resultaat = await fetch("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-Token": csrfToken
-                    },
-                    credentials: "include",
-                    body: JSON.stringify(voertuigData)
-                });
-                if (resultaat.ok) {
-                    alert("Voertuig toegevoegd!");
-                    formulier.reset();
-                } else {
-                    alert("Er is iets fout gegaan tijdens het toevoegen van het voertuig. Probeer het opnieuw!");
-                }
-            } catch (error) {
-                console.error("Fout: ", error);
-            }
+  const voertuigToevoegen = async (values: typeof form.values) => {
+    const csrfToken = getCsrfToken();
+
+    if (csrfToken) {
+      try {
+        const resultaat = await fetch("http://localhost:5202/api/VoertuigBeheer/AddVoertuig", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken,
+          },
+          credentials: "include",
+          body: JSON.stringify(values),
+        });
+
+        if (resultaat.ok) {
+          addNotificatie("Voertuig toegevoegd!", "success", false);
+          form.reset();
+        } else {
+          addNotificatie(
+            "Er is iets fout gegaan tijdens het toevoegen van het voertuig. Probeer het opnieuw!",
+            "error",
+            true
+          );
         }
-    };
+      } catch (error) {
+        console.error("Fout: ", error);
+      }
+    }
+  };
 
-    return (
-        <form onSubmit={voertuigToevoegen}>
-            <div>
-                <label>
-                    Kenteken:
-                    <input type="text" name="kenteken" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Soort:
-                    <input type="text" name="soort" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Merk:
-                    <input type="text" name="merk" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Type:
-                    <input type="text" name="type" required />
-                </label>
-            </div>
-            <div>
-                <label>
-                    Aanschafjaar:
-                    <input type="number" name="aanschafjaar" required />
-                </label>
-            </div>
-            <button type="submit">Toevoegen</button>
+  return (
+    <div>
+        <h1>Voertuig toevoegen</h1>
+        
+        <form onSubmit={form.onSubmit(voertuigToevoegen)}>
+            <TextInput
+                label="Kenteken"
+                placeholder="Vul het kenteken in"
+                {...form.getInputProps("kenteken")}
+                required
+            />
+
+            <TextInput
+                label="Soort"
+                placeholder="Voer het soort voertuig in"
+                {...form.getInputProps("soort")}
+                required
+            />
+
+            <TextInput
+                label="Merk"
+                placeholder="Voer het merk in"
+                {...form.getInputProps("merk")}
+                required
+            />
+
+            <TextInput
+                label="Type"
+                placeholder="Voer het type voertuig in"
+                {...form.getInputProps("type")}
+                required
+            />
+
+            <NumberInput
+                label="Aanschafjaar"
+                placeholder="Voer het aanschafjaar in"
+                min={1900}
+                max={new Date().getFullYear()}
+                {...form.getInputProps("aanschafjaar")}
+                required
+            />
+
+            <Group mt="md">
+                <Button color="#2E8540" type="submit">Toevoegen</Button>
+            </Group>
         </form>
-    );
+    </div>
+  );
 }

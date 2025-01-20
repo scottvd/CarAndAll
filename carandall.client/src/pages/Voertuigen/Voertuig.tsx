@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
+import { useNotificaties } from "../../utilities/NotificatieContext";
+import { Button } from "@mantine/core";
 
 export function Voertuig() {
     useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
-       
+    const { addNotificatie } = useNotificaties();   
     const location = useLocation();
     const { voertuig } = location.state || {};
 
@@ -35,7 +37,7 @@ export function Voertuig() {
                 throw new Error(`Foutmelding: ${resultaat.status}`);
                 }
 
-                alert("Voertuig succesvol verwijderd!");
+                addNotificatie("Voertuig succesvol verwijderd!", "success", false);
             } catch (error) {
             console.error(error);
             }
@@ -64,7 +66,7 @@ export function Voertuig() {
                     throw new Error(`Foutmelding: ${resultaat.status}`);
                 }
 
-                alert("Voertuig succesvol bijgewerkt!");
+                addNotificatie("Voertuig succesvol bijgewerkt!", "success", true);
                 setEditModus(false);
             } catch (error) {
                 console.error(error);
@@ -84,7 +86,7 @@ export function Voertuig() {
     return (
         <div>
             <div>
-                <h2>{editedVoertuig.merk} {editedVoertuig.type}, {editedVoertuig.aanschafjaar}</h2>
+                <h1>{editedVoertuig.merk} {editedVoertuig.type}, {editedVoertuig.aanschafjaar}</h1>
                 {editModus ? (
                     <div>
                         <p><strong>Kenteken:</strong> <input type="text" name="kenteken" value={editedVoertuig.kenteken} onChange={handleInputChange} /></p>
@@ -106,13 +108,13 @@ export function Voertuig() {
             <div className="button-container">
                 {editModus ? (
                     <>
-                        <button className="save-button" onClick={updateVoertuig}>Opslaan</button>
-                        <button className="cancel-button" onClick={() => setEditModus(false)}>Annuleren</button>
+                        <Button color="#2E8540" mr="1rem" className="save-button" onClick={updateVoertuig}>Opslaan</Button>
+                        <Button color="#E31C3D" className="cancel-button" onClick={() => setEditModus(false)}>Annuleren</Button>
                     </>
                 ) : (
                     <>
-                        <button className="edit-button" onClick={() => setEditModus(true)}>Bewerken</button>
-                        <button className="delete-button" onClick={verwijderVoertuig}>Verwijder</button>
+                        <Button color="#2E8540" mr="1rem" className="edit-button" onClick={() => setEditModus(true)}>Bewerken</Button>
+                        <Button color="#E31C3D" className="delete-button" onClick={verwijderVoertuig}>Verwijder</Button>
                     </>
                 )}
             </div>

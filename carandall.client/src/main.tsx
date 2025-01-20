@@ -6,9 +6,7 @@ import "@mantine/notifications/styles.css";
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
-import { Notifications } from "@mantine/notifications";
 import axios from "axios";
-
 import Landing from "./pages/Static/Landing.tsx";
 import { NotFound } from "./pages/Static/NotFound.tsx";
 import { Dashboard } from "./pages/Dashboard/Dashboard.tsx";
@@ -25,6 +23,8 @@ import { Verhuuraanvragen } from "./pages/Controlepaneel/Verhuuraanvragen.tsx";
 import { Medewerkers } from "./pages/Controlepaneel/Medewerkers.tsx";
 import { Profiel } from "./pages/Profiel/Profiel.tsx";
 import { Afhandelen } from "./pages/Controlepaneel/Afhandelen.tsx";
+import { NotificatieProvider } from "./utilities/NotificatieContext.tsx";
+import { LandingPagina } from "./pages/Dashboard/LandingPagina.tsx";
 
 export const api = axios.create({
   baseURL: "https://localhost:7140",
@@ -40,6 +40,7 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: <Dashboard />,
     children: [
+      { index: true, element: <LandingPagina />},
       { path: "abonnement", element: <Aanvragen /> },
       {
         path: "profiel",
@@ -93,11 +94,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <MantineProvider>
-            <ModalsProvider>
-                <Notifications />
-                <RouterProvider router={router} />
-            </ModalsProvider>
-        </MantineProvider>
+      <MantineProvider>
+        <NotificatieProvider>
+          <ModalsProvider>
+            <RouterProvider router={router} />
+          </ModalsProvider>
+        </NotificatieProvider>
+      </MantineProvider>
     </StrictMode>
 );

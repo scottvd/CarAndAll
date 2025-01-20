@@ -5,10 +5,11 @@ import { VerhuuraanvraagAfhandelen } from "../../types/Types";
 import { useEffect, useState } from "react";
 import { Card, Group, Text, TextInput, Button, Collapse, NumberInput } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Afhandelen() {
     useAuthorisatie(["FrontofficeMedewerker", "BackofficeMedewerker"]);
-
+    const { addNotificatie } = useNotificaties();   
     const [data, setData] = useState<VerhuuraanvraagAfhandelen[] | null>(null);
     const [formulier, setFormulier] = useState<{ [key: string]: boolean }>({});
     const [formulierData, setFormulierData] = useState<{ [key: string]: { omschrijving: string, herstelperiode: number } }>({});
@@ -77,9 +78,9 @@ export function Afhandelen() {
                     throw new Error(`Foutmelding: ${response.status}`);
                 }
 
-                console.log(`Request succeeded for verhuuraanvraagId: ${id}`);
+                addNotificatie("Verhuuraanvraag succesvol geaccepteerd!", "success", false)
             } catch (error) {
-                console.error(`Error handling verhuuraanvraagId ${id}:`, error);
+                addNotificatie("Verhuuraanvraag kon niet geaccepteerd worden. Probeer het opnieuw!", "error", true)
             }
         }
     };
@@ -111,17 +112,18 @@ export function Afhandelen() {
                 <Card.Section inheritPadding mt="sm">
                     <Group justify="space-between">
                         <Button 
-                            color="green" 
+                            color="#2E8540" 
                             onClick={() => handleVerhuuraanvraagAfhandelen(verhuuraanvraag.verhuuraanvraagId.toString())}
+                            aria-label={`Neem ${verhuuraanvraag.voertuig}, gehuurd door ${verhuuraanvraag.huurder} tot ${verhuuraanvraag.inleverDatum} in`}
                         >
                             Voertuig innemen
                         </Button>
 
                         <Group
-                            style={{ cursor: "pointer", color: "#1e88e5" }}
+                            style={{ cursor: "pointer", color: "#E31C3D" }}
                             onClick={() => toggleFormulier(verhuuraanvraag.verhuuraanvraagId.toString())}
                         >
-                            <Text style={{ display: "inline-flex", alignItems: "center" }}>
+                            <Text style={{ display: "inline-flex", alignItems: "center" }} tabIndex={0} aria-label={`Voeg een schadeformulier toe voor ${verhuuraanvraag.voertuig}, gehuurd door ${verhuuraanvraag.huurder} tot ${verhuuraanvraag.inleverDatum} in`}>
                                 Schadeformulier bijvoegen{" "}
                                 <IconChevronDown
                                     size={16}
@@ -170,7 +172,7 @@ export function Afhandelen() {
 
     return (
         <div>
-            <h2>Verhuuraanvragen afhandelen</h2>
+            <h1>Verhuuraanvragen afhandelen</h1>
 
             <div>{verhuuraanvraagCards()}</div>
         </div>

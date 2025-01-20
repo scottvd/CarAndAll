@@ -5,10 +5,12 @@ import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Button, Group, PasswordInput, TextInput } from "@mantine/core";
 import { isEmail, useForm } from "@mantine/form";
 import { Huurder } from "../../types/Types";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Profiel() {
     useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);
-
+    const { addNotificatie } = useNotificaties();
+    
     const [data, setData] = useState<Huurder | null>(null);
 
     useEffect(() => {
@@ -130,11 +132,11 @@ export function Profiel() {
                         });
                 
                         if (resultaat.ok) {
-                            alert("Medewerker bijgewerkt!");
+                            addNotificatie("Medewerker bijgewerkt!", "success", false);
                             await getHuurder();
                         } 
                         else {
-                            alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+                            addNotificatie("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!", "error", true);
                         }
                     } catch (error) {
                         console.error("Fout: ", error);
@@ -160,10 +162,10 @@ export function Profiel() {
                     });
             
                     if (resultaat.ok) {
-                        alert("Verwijderingsverzoek succesvol ingediend! Over 6 maanden worden uw gegevens definitied verwijderd.");
+                        addNotificatie("Verwijderingsverzoek succesvol ingediend! Over 6 maanden worden uw gegevens definitied verwijderd.", "success", false);
                     } 
                     else {
-                        alert("Er is iets fout gegaan tijdens het aanmaken van het verwijderingsverzoek. Probeer het opnieuw!");
+                        addNotificatie("Er is iets fout gegaan tijdens het aanmaken van het verwijderingsverzoek. Probeer het opnieuw!", "error", true);
                     }
                 } catch (error) {
                     console.error("Fout: ", error);
@@ -175,7 +177,7 @@ export function Profiel() {
 
     return (
         <div>
-            <h2>Gegevens bewerken</h2>
+            <h1>Gegevens bewerken</h1>
 
             <form onSubmit={(e) => e.preventDefault()}>
                 <TextInput
@@ -239,11 +241,11 @@ export function Profiel() {
                 />
 
                 <Group justify="space-between" grow>
-                    <Button color="green" onClick={() => handleBewerken()}>
+                    <Button color="#2E8540" onClick={() => handleBewerken()}>
                         Opslaan
                     </Button>
                     
-                    <Button color="red" onClick={() => handleVerwijderingsverzoek()}>
+                    <Button color="#E31C3D" onClick={() => handleVerwijderingsverzoek()}>
                         Gegevens verwijderen
                     </Button>
                 </Group>

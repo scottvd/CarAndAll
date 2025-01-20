@@ -1,6 +1,7 @@
 import { Button, Checkbox, Group, PasswordInput, TextInput, Paper, Container } from "@mantine/core";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { useNavigate } from "react-router-dom";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Register() {
   const form = useForm({
@@ -51,6 +52,7 @@ export function Register() {
     },
   });
 
+  const { addNotificatie } = useNotificaties();
   const navigate = useNavigate();
 
   const naarLogin = () => {
@@ -83,111 +85,111 @@ export function Register() {
       });
 
       if (resultaat.ok) {
-        alert("U bent geregistreerd!");
+        addNotificatie("U bent geregistreerd! U wordt naar de login pagina gebracht.");
         form.reset();
+        naarLogin();
       } else {
-        console.log(await resultaat.json());
-        alert(
-          "Er is iets fout gegaan tijdens het aanmaken van uw account. Probeer het opnieuw!"
-        );
+        addNotificatie("Er is iets fout gegaan tijdens het aanmaken van uw account. Probeer het opnieuw!");
       }
     } catch (error) {
-      console.error("Fout: ", error);
+      addNotificatie("Fout: " + error);
     }
   };
 
   return (
-    <Container size="xs" style={{ marginTop: "10vh" }}>
-      <Paper withBorder>
-        <div style={{ padding: "1em" }}>
-          <h3>Registreren</h3>
+    <main>
+      <Container size="xs" style={{ marginTop: "8vh" }}>
+        <Paper withBorder>
+          <div style={{ padding: "1em" }}>
+            <h1>Registreren</h1>
 
-          <form onSubmit={form.onSubmit(handleFormSubmit)}>
-            <TextInput
-              withAsterisk
-              label="Naam"
-              placeholder="Naam"
-              {...form.getInputProps("naam")}
-            />
-
-            <TextInput
-              withAsterisk
-              label="Emailadres"
-              placeholder="naam@adres.nl"
-              {...form.getInputProps("email")}
-            />
-
-            <Group>
-              <Checkbox
-                mt="md"
-                label="Zakelijke huurder"
-                {...form.getInputProps("zakelijk", { type: "checkbox" })}
-              />
-
-              {form.values.zakelijk && (
-                <TextInput
-                  withAsterisk
-                  label="KVK-nummer"
-                  placeholder="123456789"
-                  {...form.getInputProps("kvk")}
-                />
-              )}
-            </Group>
-
-            {form.values.zakelijk ? (
-              <Group>
-                <TextInput
-                  withAsterisk
-                  label="Bedrijfsnaam"
-                  placeholder="Bedrijfsnaam"
-                  {...form.getInputProps("bedrijfNaam")}
-                />
-
-                <TextInput
-                  withAsterisk
-                  label="Bedrijfsadres"
-                  placeholder="Bedrijfsadres"
-                  {...form.getInputProps("bedrijfAdres")}
-                />
-              </Group>
-            ) : (
+            <form onSubmit={form.onSubmit(handleFormSubmit)}>
               <TextInput
                 withAsterisk
-                label="Adres"
-                placeholder="Straat 123"
-                {...form.getInputProps("adres")}
+                label="Naam"
+                placeholder="Naam"
+                {...form.getInputProps("naam")}
               />
-            )}
 
-            <PasswordInput
-              label="Wachtwoord"
-              placeholder="Wachtwoord"
-              mt="md"
-              size="md"
-              {...form.getInputProps("wachtwoord")}
-            />
+              <TextInput
+                withAsterisk
+                label="Emailadres"
+                placeholder="naam@adres.nl"
+                {...form.getInputProps("email")}
+              />
 
-            <PasswordInput
-              label="Wachtwoord bevestigen"
-              placeholder="Wachtwoord"
-              mt="md"
-              size="md"
-              {...form.getInputProps("wachtwoordBevestiging")}
-            />
+              <Group>
+                <Checkbox
+                  mt="md"
+                  label="Zakelijke huurder"
+                  {...form.getInputProps("zakelijk", { type: "checkbox" })}
+                />
 
-            <Button type="submit" fullWidth mt="xl" size="md">
-              Registreren
+                {form.values.zakelijk && (
+                  <TextInput
+                    withAsterisk
+                    label="KVK-nummer"
+                    placeholder="123456789"
+                    {...form.getInputProps("kvk")}
+                  />
+                )}
+              </Group>
+
+              {form.values.zakelijk ? (
+                <Group>
+                  <TextInput
+                    withAsterisk
+                    label="Bedrijfsnaam"
+                    placeholder="Bedrijfsnaam"
+                    {...form.getInputProps("bedrijfNaam")}
+                  />
+
+                  <TextInput
+                    withAsterisk
+                    label="Bedrijfsadres"
+                    placeholder="Bedrijfsadres"
+                    {...form.getInputProps("bedrijfAdres")}
+                  />
+                </Group>
+              ) : (
+                <TextInput
+                  withAsterisk
+                  label="Adres"
+                  placeholder="Straat 123"
+                  {...form.getInputProps("adres")}
+                />
+              )}
+
+              <PasswordInput
+                label="Wachtwoord"
+                placeholder="Wachtwoord"
+                mt="md"
+                size="md"
+                {...form.getInputProps("wachtwoord")}
+              />
+
+              <PasswordInput
+                label="Wachtwoord bevestigen"
+                placeholder="Wachtwoord"
+                mt="md"
+                size="md"
+                {...form.getInputProps("wachtwoordBevestiging")}
+              />
+
+              <Button type="submit" fullWidth mt="xl" size="md" color="#28282B">
+                Registreren
+              </Button>
+            </form>
+          </div>
+
+          <Group style={{ padding: "1em" }}>
+            <p>Al een account?</p>
+            <Button variant="outline" color="#28282B" onClick={naarLogin}>
+              Inloggen
             </Button>
-          </form>
-        </div>
-
-        <Group style={{ padding: "1em" }}>
-          <p>Al een account?</p>
-          <Button variant="outline" onClick={naarLogin}>
-            Inloggen
-          </Button>
-        </Group>
-      </Paper>
-    </Container>
+          </Group>
+        </Paper>
+      </Container>
+    </main>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DateInput } from "@mantine/dates";
+import { DateInput, DatePicker, DatePickerInput } from "@mantine/dates";
 import { Button, Group, Grid, Card, Text, Modal, TextInput, MultiSelect } from "@mantine/core";
 import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
@@ -7,10 +7,11 @@ import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Prijs, Soort, VoertuigMetPrijs } from "../../types/Types";
 import { Filterwaarden } from "../../interfaces/interfaces";
 import { tijdzoneConverter } from "../../utilities/tijdzoneConverter";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Overzicht() {
   useAuthorisatie(["Particulier", "Zakelijk", "Wagenparkbeheerder"]);
-
+  const { addNotificatie } = useNotificaties();
   const [ophaalDatum, setOphaalDatum] = useState<Date | null>(null);
   const [inleverDatum, setInleverDatum] = useState<Date | null>(null);
   const [data, setData] = useState<VoertuigMetPrijs[] | null>(null);
@@ -95,7 +96,7 @@ export function Overzicht() {
 
   const bevestigAanvraag = async () => {
     if (!geselecteerdVoertuig || !ophaalDatum || !inleverDatum) {
-      alert("De data om uw verhuuraanvraag te doen is incompleet, probeer het opnieuw.");
+      addNotificatie("De data om uw verhuuraanvraag te doen is incompleet, probeer het opnieuw.", "error", true);
       return;
     }
 
@@ -120,9 +121,9 @@ export function Overzicht() {
         });
 
         if (resultaat.ok) {
-          alert("Uw verhuuraanvraag is opgenomen!");
+          addNotificatie("Uw verhuuraanvraag is opgenomen!", "success", false);
         } else {
-          alert("Er is iets fout gegaan tijdens het maken van uw aanvraag. Probeer het opnieuw!");
+          addNotificatie("Er is iets fout gegaan tijdens het maken van uw aanvraag. Probeer het opnieuw!", "error", true);
         }
       } catch (error) {
         console.error("Fout: ", error);
@@ -167,7 +168,7 @@ export function Overzicht() {
           </Text>
         </Card.Section>
 
-        <Button onClick={() => handleVerhuuraanvraag(voertuig)}>
+        <Button color="#28282B" onClick={() => handleVerhuuraanvraag(voertuig)}>
           Verhuuraanvraag indienen
         </Button>
       </Card>
@@ -179,25 +180,28 @@ export function Overzicht() {
 
   return (
     <div>
-      <h2>Huren</h2>
+      <h1>Huren</h1>
 
       <Group>
-        <DateInput
+        <DatePickerInput
           value={ophaalDatum}
           onChange={setOphaalDatum}
           label="Ophaaldatum"
+          aria-label="Selecteer een ophaaldatum"
           placeholder="Klik hier om een ophaaldatum te kiezen"
           minDate={datumVanMorgen}
           maxDate={inleverDatum || undefined}
         />
-        <DateInput
+
+        <DatePickerInput
           value={inleverDatum}
           onChange={setInleverDatum}
           label="Inleverdatum"
           placeholder="Klik hier om een inleverdatum te kiezen"
           minDate={ophaalDatum || datumVanMorgen}
         />
-        <Button onClick={getVoertuigen}>Voertuigen weergeven</Button>
+        
+        <Button color="#28282B" onClick={getVoertuigen}>Voertuigen weergeven</Button>
       </Group>
 
       <Group>
@@ -237,7 +241,7 @@ export function Overzicht() {
           Subtotaal: €{" "}
           {berekenSubtotaal(ophaalDatum, inleverDatum, geselecteerdVoertuig?.prijs ?? 0)}
         </p>
-        <Button onClick={bevestigAanvraag}>Bevestigen</Button>
+        <Button color="#2E8540" onClick={bevestigAanvraag}>Bevestigen</Button>
       </Modal>
     </div>
   );

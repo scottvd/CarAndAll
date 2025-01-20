@@ -30,7 +30,7 @@ namespace CarAndAll.Server.Controllers
             var resultaat = await _context.Verhuuraanvragen
                 .Where(
                     v => v.Status == AanvraagStatus.Geaccepteerd &&
-                    v.InleverDatum == DateTime.Today
+                    v.InleverDatum <= DateTime.Today
                 )
                 .Select(v => new {
                     v.VerhuuraanvraagId,

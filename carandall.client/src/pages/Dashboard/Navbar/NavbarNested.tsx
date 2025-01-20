@@ -47,7 +47,7 @@ export function NavbarNested() {
   const links = mockdata.map((item) => <LinksGroup {...item} key={item.label} />);
 
   return (
-    <nav className={classes.navbar}>
+    <nav aria-label="Navigatie menu" className={classes.navbar}>
 
 
       <ScrollArea className={classes.links}>

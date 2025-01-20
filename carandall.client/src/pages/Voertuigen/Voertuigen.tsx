@@ -6,9 +6,6 @@ import { IconSearch } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { Voertuig } from "../../types/Types";
 
-
-
-
 export function Voertuigen() {
   useAuthorisatie(["BackofficeMedewerker", "FrontofficeMedewerker"]);
 
@@ -54,14 +51,18 @@ export function Voertuigen() {
       <td>{voertuig.type}</td>
       <td>{voertuig.aanschafjaar}</td>
       <td className="button">
-        <Button onClick={() => huren(voertuig)}>Bewerken</Button>
+        <Button 
+          aria-label={`Bewerk de ${voertuig.soort} ${voertuig.merk} ${voertuig.type} met kenteken ${voertuig.kenteken} en aanschafjaar ${voertuig.aanschafjaar}`} color="#28282B" onClick={() => huren(voertuig)}
+        >
+          Bewerken
+        </Button>
       </td>
     </tr>
   ));
 
   return (
     <div>
-      <h2>Controlepaneel CarAndAll vloot</h2>
+      <h1>Controlepaneel CarAndAll vloot</h1>
 
       <div>
         <Group>
@@ -72,24 +73,28 @@ export function Voertuigen() {
             value={zoekwaarde}
             onChange={zoekVoertuig}
           />
-          <Button mb="md" onClick={() => navigate('/dashboard/voertuigen/toevoegen')}>Voertuig toevoegen</Button>
+          <Button color="#28282B" mb="md" onClick={() => navigate('/dashboard/voertuigen/toevoegen')}>Voertuig toevoegen</Button>
         </Group>
 
         <div>
           <Table border={1} className="basistabel">
+            <caption>Overzicht van de voertuigen</caption>
             <thead>
               <tr>
-                <th>Kenteken</th>
-                <th>Soort</th>
-                <th>Merk</th>
-                <th>Type</th>
-                <th>Aanschafjaar</th>
-                </tr>
-              </thead>
-              <tbody>{rows}</tbody>
-            </Table>
-          </div>            
-        </div>
+                <th scope="col">Kenteken</th>
+                <th scope="col">Soort</th>
+                <th scope="col">Merk</th>
+                <th scope="col">Type</th>
+                <th scope="col">Aanschafjaar</th>
+              </tr>
+            </thead>
+              
+            <tbody>
+              {rows}
+            </tbody>
+          </Table>
+        </div>            
       </div>
+    </div>
   );
 }

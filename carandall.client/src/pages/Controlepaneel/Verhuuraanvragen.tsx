@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, TextInput, Group } from "@mantine/core";
+import { Table } from "@mantine/core";
 import '../../styles/table.css';
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
@@ -80,14 +80,18 @@ export function Verhuuraanvragen() {
           {isInBehandeling ? (
             <>
               <IconCheck
-                color="green"
+                color="#2E8540"
                 style={{ cursor: 'pointer', marginRight: '10px' }}
                 onClick={() => handleStatusChange(data.verhuuraanvraagID, 'Geaccepteerd')}
+                tabIndex={0}
+                aria-label={`Accepteer verhuuraanvraag voor ${data.voertuig} van ${data.ophaaldatum} tot ${data.inleverdatum}`}
               />
               <IconX
-                color="red"
+                color="#E31C3D"
                 style={{ cursor: 'pointer' }}
                 onClick={() => handleStatusChange(data.verhuuraanvraagID, 'Afgewezen')}
+                tabIndex={0}
+                aria-label={`Weiger verhuuraanvraag voor ${data.voertuig} van ${data.ophaaldatum} tot ${data.inleverdatum}`}
               />
             </>
           ) : null}
@@ -100,20 +104,20 @@ export function Verhuuraanvragen() {
 
   return (
     <div>
-      <h2>Controlepaneel CarAndAll vloot</h2>
+      <h1>Controlepaneel CarAndAll vloot</h1>
 
       <div>
-        <h3>Openstaande verhuuraanvragen</h3>
+        <h2>Openstaande verhuuraanvragen</h2>
         <Table border={1} className="basistabel">
           <thead>
             <tr>
-              <th>Voertuig</th>
-              <th>Kenteken</th>
-              <th>Huurder</th>
-              <th>Ophaaldatum</th>
-              <th>Inleverdatum</th>
-              <th>Status</th>
-              <th>Handelingen</th>
+              <th scope="col">Voertuig</th>
+              <th scope="col">Kenteken</th>
+              <th scope="col">Huurder</th>
+              <th scope="col">Ophaaldatum</th>
+              <th scope="col">Inleverdatum</th>
+              <th scope="col">Status</th>
+              <th scope="col">Handelingen</th>
             </tr>
           </thead>
           
@@ -124,16 +128,16 @@ export function Verhuuraanvragen() {
       </div>
 
       <div>
-        <h3>Behandelde verhuuraanvragen</h3>
+        <h2>Behandelde verhuuraanvragen</h2>
         <Table border={1} className="basistabel">
           <thead>
             <tr>
-              <th>Voertuig</th>
-              <th>Kenteken</th>
-              <th>Huurder</th>
-              <th>Ophaaldatum</th>
-              <th>Inleverdatum</th>
-              <th>Status</th>
+              <th scope="col">Voertuig</th>
+              <th scope="col">Kenteken</th>
+              <th scope="col">Huurder</th>
+              <th scope="col">Ophaaldatum</th>
+              <th scope="col">Inleverdatum</th>
+              <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody>{renderRows(behandeldeData, false)}</tbody>

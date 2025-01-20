@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Medewerker } from "../../types/Types";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Medewerkers() {
   useAuthorisatie(["BackofficeMedewerker"]);
+  const { addNotificatie } = useNotificaties();   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [data, setData] = useState<Medewerker[]>([]);
   const [selectedMedewerker, setSelectedMedewerker] = useState<Medewerker | null>(null);
@@ -109,11 +111,11 @@ export function Medewerkers() {
           });
 
           if (resultaat.ok) {
-            alert("Medewerker toegevoegd!");
+            addNotificatie("Medewerker toegevoegd!", "success", false);
             await getMedewerkers();
             createFormulier.reset();
           } else {
-            alert("Er is iets fout gegaan tijdens het toevoegen van de medewerker. Probeer het opnieuw!");
+            addNotificatie("Er is iets fout gegaan tijdens het toevoegen van de medewerker. Probeer het opnieuw!", "error", true);
           }
         } catch (error) {
           console.error("Fout: ", error);
@@ -157,11 +159,11 @@ export function Medewerkers() {
           );
 
           if (resultaat.ok) {
-            alert("Medewerker bijgewerkt!");
+            addNotificatie("Medewerker bijgewerkt!", "success", false);
             setIsModalOpen(false);
             await getMedewerkers();
           } else {
-            alert("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!");
+            addNotificatie("Er is iets fout gegaan tijdens het bijwerken van de medewerker. Probeer het opnieuw!", "error", true);
           }
         } catch (error) {
           console.error("Fout: ", error);
@@ -186,16 +188,15 @@ export function Medewerkers() {
         });
 
         if (resultaat.ok) {
-          alert("Medewerker succesvol verwijderd!");
+          addNotificatie("Medewerker succesvol verwijderd!", "success", false);
           setIsModalOpen(false);
           await getMedewerkers();
         } else {
           const errorMessage = await resultaat.text();
-          alert(`Er is iets fout gegaan: ${errorMessage}`);
+          addNotificatie(`Er is iets fout gegaan: ${errorMessage}`, "error", true);
         }
       } catch (error) {
         console.error("Fout: ", error);
-        alert("Er is een fout opgetreden bij het verwijderen van de medewerker.");
       }
     }
   };
@@ -209,7 +210,7 @@ export function Medewerkers() {
         <td>{medewerker.email}</td>
         <td>{medewerker.rol}</td>
         <td>
-          <Button onClick={() => openModal(medewerker)}>Bewerken</Button>
+          <Button color="#28282B" onClick={() => openModal(medewerker)}>Bewerken</Button>
         </td>
       </tr>
     ));
@@ -217,10 +218,10 @@ export function Medewerkers() {
 
   return (
     <div>
-      <h2>Medewerkers beheren</h2>
+      <h1>Medewerkers beheren</h1>
 
       <form onSubmit={handleToevoegen}>
-        <h4>Medewerker toevoegen</h4>
+        <h2>Medewerker toevoegen</h2>
         <Group grow>
           <TextInput
             withAsterisk
@@ -262,20 +263,20 @@ export function Medewerkers() {
           />
         </Group>
 
-        <Button color="green" type="submit" fullWidth mt="xl" size="md">
+        <Button color="#2E8540" type="submit" fullWidth mt="xl" size="md">
           Toevoegen
         </Button>
       </form>
 
-      <h4>Medewerkers beheren</h4>
+      <h2>Medewerkers beheren</h2>
       <Table border={1} className="basistabel">
         <thead>
           <tr>
-            <th>Naam</th>
-            <th>Personeelsnummer</th>
-            <th>Emailadres</th>
-            <th>Rol</th>
-            <th>Acties</th>
+            <th scope="col">Naam</th>
+            <th scope="col">Personeelsnummer</th>
+            <th scope="col">Emailadres</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Acties</th>
           </tr>
         </thead>
         <tbody>{renderRows()}</tbody>
@@ -324,11 +325,11 @@ export function Medewerkers() {
           <Checkbox label="Geef medewerker backoffice permissies" {...editFormulier.getInputProps("backoffice")} />
 
           <Group justify="space-between" grow>
-            <Button color="green" onClick={handleBewerken} fullWidth mt="xl">
+            <Button color="#2E8540" onClick={handleBewerken} fullWidth mt="xl">
               Opslaan
             </Button>
 
-            <Button color="red" onClick={() => selectedMedewerker && handleVerwijderen(selectedMedewerker.id)} fullWidth mt="xl">
+            <Button color="#E31C3D" onClick={() => selectedMedewerker && handleVerwijderen(selectedMedewerker.id)} fullWidth mt="xl">
               Verwijder medewerker
             </Button>
           </Group>

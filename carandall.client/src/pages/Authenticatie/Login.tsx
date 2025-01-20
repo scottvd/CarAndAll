@@ -1,69 +1,74 @@
-import { Button, Checkbox, Group, PasswordInput, TextInput, Paper, Container } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
-import { useState } from "react";
+import { Button, PasswordInput, TextInput, Paper, Container } from '@mantine/core';
+import { isNotEmpty, useForm } from '@mantine/form';
+import { useNotificaties } from '../../utilities/NotificatieContext';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 export function Login() {
-    const form = useForm({
-        initialValues: {
-            email: "",
-            wachtwoord: "",
+  const form = useForm({
+    initialValues: {
+      email: '',
+      wachtwoord: '',
+    },
+    validate: {
+      email: isNotEmpty('Vul een emailadres in.'),
+      wachtwoord: isNotEmpty('Vul een wachtwoord in.'),
+    },
+  });
+
+  const { addNotificatie } = useNotificaties();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!form.isValid()) {
+      addNotificatie('Het invullen van een emailadres en wachtwoord is verplicht.', 'error', true);
+      return;
+    }
+
+    try {
+      const requestBody: any = {
+        Email: form.values.email,
+        Wachtwoord: form.values.wachtwoord,
+      };
+
+      const resultaat = await fetch('http://localhost:5202/api/Authenticatie/LogIn', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        validate: {
-            email: isNotEmpty("Vul een emailadres in."),
-            wachtwoord: isNotEmpty("Vul een wachtwoord in.")
-        },
-    });
+        body: JSON.stringify(requestBody),
+      });
 
-    const [error, setError] = useState("");
+      if (resultaat.ok) {
+        addNotificatie('U bent ingelogd! U wordt naar het dashboard gebracht.', 'success', false);
+        form.reset();
+        navigate('/dashboard'); 
+      } else {
+        addNotificatie('Er is iets fout gegaan tijdens het inloggen. Probeer het opnieuw.', 'error', true);
+      }
+    } catch (error) {
+      if (error) {
+        addNotificatie(`Fout: ${error}`, 'error', true);
+      }
+    }
+  };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        if (!form.isValid()) {
-            setError("Please fix the errors in the form.");
-            return;
-        }
-
-        try {
-            const requestBody: any = {
-                Email: form.values.email,
-                Wachtwoord: form.values.wachtwoord
-            };
-
-            const resultaat = await fetch("http://localhost:5202/api/Authenticatie/LogIn", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (resultaat.ok) {
-                alert("U bent ingelogd!");
-                form.reset();
-            } else {
-                console.log(await resultaat.json());
-                alert("Er is iets fout gegaan tijdens het inloggen. Probeer het opnieuw.");
-            }
-        } catch (error) {
-            console.error("Fout: ", error);
-        }
-    };
-
-    return (
-        <Container size="xs" style={{ marginTop: "10vh" }}>
+  return (
+    <main>
+        <Container size="xs" style={{ marginTop: '10vh' }}>
             <Paper withBorder>
-                <div style={{ padding: "1em" }}>
-                    <h3>Inloggen</h3>
+                <div style={{ padding: '1em' }}>
+                    <h1>Inloggen</h1>
 
                     <form onSubmit={handleSubmit}>
                         <TextInput
                             required
                             label="Emailadres"
                             placeholder="naam@adres.nl"
-                            key={form.key("email")}
-                            {...form.getInputProps("email")}
+                            key={form.key('email')}
+                            {...form.getInputProps('email')}
                         />
 
                         <PasswordInput
@@ -72,7 +77,7 @@ export function Login() {
                             placeholder="Wachtwoord"
                             mt="md"
                             size="md"
-                            {...form.getInputProps("wachtwoord")}
+                            {...form.getInputProps('wachtwoord')}
                         />
 
                         <Button
@@ -80,15 +85,15 @@ export function Login() {
                             fullWidth
                             mt="xl"
                             size="md"
+                            color="#28282B"
                             disabled={!form.isValid()}
                         >
                             Inloggen
                         </Button>
                     </form>
                 </div>
-
-                {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
             </Paper>
         </Container>
-    );
+    </main>
+  );
 }
