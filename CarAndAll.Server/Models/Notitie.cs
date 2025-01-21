@@ -7,18 +7,18 @@ namespace CarAndAll.Server.Models
         [Key]
         public int NotitieId { get; set; }
 
-        [Required, MaxLength(500)] // Meer ruimte voor langere notities
+        [Required, MaxLength(500)]
         public string Inhoud { get; set; }
 
         [Required]
-        public DateTime Datum { get; set; } // Datum wanneer de notitie is toegevoegd
+        public DateTime Datum { get; set; }
 
         [Required]
-        public int SchademeldingId { get; set; } // Foreign key naar Schademelding
+        public int SchademeldingId { get; set; }
         public Schademelding Schademelding { get; set; }
 
         [Required]
-        public string MedewerkerId { get; set; } // Foreign key naar Medewerker
+        public string MedewerkerId { get; set; }
         public Medewerker Medewerker { get; set; }
     }
 }

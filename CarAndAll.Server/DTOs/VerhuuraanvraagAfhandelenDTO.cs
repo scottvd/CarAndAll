@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace CarAndAll.Server.Models
 {
     public class VerhuuraanvraagAfhandelenDTO

@@ -62,11 +62,10 @@ namespace CarAndAll.Controllers
                     };
 
                     _context.Bedrijven.Add(nieuwBedrijf);
-                    nieuweHuurder.BedrijfId = nieuwBedrijf.KVKNummer; // Set relationship directly.
+                    nieuweHuurder.BedrijfId = nieuwBedrijf.KVKNummer;
                 }
 
-                await _context.SaveChangesAsync(); // Consolidate all changes into one call.
-
+                await _context.SaveChangesAsync();
                 return Ok();
             }
             catch (Exception ex)

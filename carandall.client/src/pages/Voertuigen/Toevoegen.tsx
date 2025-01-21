@@ -1,4 +1,3 @@
-import React from "react";
 import { TextInput, NumberInput, Button, Group } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { getCsrfToken } from "../../utilities/getCsrfToken";

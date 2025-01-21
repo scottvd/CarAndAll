@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using System.Threading.Tasks;
 using CarAndAll.Server.Data;
 using CarAndAll.Server.Models;
 using Microsoft.EntityFrameworkCore;

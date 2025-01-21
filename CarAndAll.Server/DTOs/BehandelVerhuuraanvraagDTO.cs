@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using CarAndAll.Server.Models;
 
 public class BehandelVerhuuraanvraagDTO
 {

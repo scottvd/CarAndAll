@@ -1,7 +1,7 @@
 import { Button, PasswordInput, Container, Paper } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useNotificaties } from "../../utilities/NotificatieContext";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 
 export function ResetWachtwoord() {
   const form = useForm({

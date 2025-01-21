@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DateInput, DatePicker, DatePickerInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { Button, Group, Grid, Card, Text, Modal, TextInput, MultiSelect } from "@mantine/core";
 import "@mantine/dates/styles.css";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";

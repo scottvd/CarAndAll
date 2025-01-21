@@ -4,9 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using CarAndAll.Server.Models;
-using System.Collections.Generic;
 using CarAndAll.Services;
 
 namespace CarAndAll.Controllers
