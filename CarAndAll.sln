@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarAndAll.Server", "CarAndA
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "carandall.client", "carandall.client\carandall.client.esproj", "{15EC7818-97C4-4BAE-8A87-D3F156157D47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarAndAll.Testen", "CarAndAll.Testen\CarAndAll.Testen.csproj", "{46398B86-B682-4B21-A707-671887D53AEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +25,10 @@ Global
 		{15EC7818-97C4-4BAE-8A87-D3F156157D47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15EC7818-97C4-4BAE-8A87-D3F156157D47}.Release|Any CPU.Build.0 = Release|Any CPU
 		{15EC7818-97C4-4BAE-8A87-D3F156157D47}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{46398B86-B682-4B21-A707-671887D53AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46398B86-B682-4B21-A707-671887D53AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46398B86-B682-4B21-A707-671887D53AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46398B86-B682-4B21-A707-671887D53AEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

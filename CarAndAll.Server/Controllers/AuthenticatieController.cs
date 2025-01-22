@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using CarAndAll.Server.Models;
 using CarAndAll.Services;
 
@@ -42,9 +38,7 @@ namespace CarAndAll.Controllers
                 return Unauthorized(new { Message = "Geen gebruiker gevonden met deze gegevens." });
             }
 
-            var wachtwoordResetDrempel = DateTime.UtcNow.Date.AddDays(-90);
-
-            if (gebruiker.WachtwoordBijgewerktDatum.Date <= wachtwoordResetDrempel.Date)
+            if (DatumService.IsVerlopen(gebruiker.WachtwoordBijgewerktDatum, 90))
             {
                 return Ok(new { Verlopen = true });
             }
@@ -62,7 +56,7 @@ namespace CarAndAll.Controllers
             }
 
             var csrfToken = Guid.NewGuid().ToString();
-            var token = GenerateJwtToken(gebruiker, rollen);
+            var token = JwtTokenService.GenereerJwtToken(gebruiker, rollen, _configuration);
 
             Response.Cookies.Append("csrfToken", csrfToken, new CookieOptions
             {
@@ -156,34 +150,6 @@ namespace CarAndAll.Controllers
             }
 
             return false;
-        }
-
-        private string GenerateJwtToken(Gebruiker gebruiker, IList<string> rollen)
-        {
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, gebruiker.Id),
-                new Claim(JwtRegisteredClaimNames.Email, gebruiker.Email),
-                new Claim(ClaimTypes.Name, gebruiker.UserName)
-            };
-
-            foreach (var rol in rollen)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, rol));
-            }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
