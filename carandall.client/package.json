@@ -2,7 +2,6 @@
   "name": "carandall.client",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -20,6 +19,7 @@
     "@tabler/icons": "^3.23.0",
     "@tabler/icons-react": "3.17.0",
     "axios": "^1.7.9",
+    "cypress": "^14.0.0",
     "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
