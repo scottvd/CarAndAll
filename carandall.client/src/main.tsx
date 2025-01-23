@@ -26,6 +26,7 @@ import { Afhandelen } from "./pages/Controlepaneel/Afhandelen.tsx";
 import { NotificatieProvider } from "./utilities/NotificatieContext.tsx";
 import { LandingPagina } from "./pages/Dashboard/LandingPagina.tsx";
 import { ResetWachtwoord } from "./pages/Authenticatie/ResetWachtwoord.tsx";
+import { Loguit } from "./pages/Authenticatie/Loguit.tsx";
 
 export const api = axios.create({
   baseURL: "https://localhost:7140",
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/loguit",
+    element: <Loguit />,
   },
   {
     path: "/reset-wachtwoord",

@@ -5,10 +5,11 @@ import { IconCheck, IconX } from "@tabler/icons-react";
 import { useAuthorisatie } from "../../utilities/useAuthorisatie";
 import { getCsrfToken } from "../../utilities/getCsrfToken";
 import { Verhuuraanvraag } from "../../types/Types";
+import { useNotificaties } from "../../utilities/NotificatieContext";
 
 export function Verhuuraanvragen() {
   useAuthorisatie(["BackofficeMedewerker"]);
-
+  const { addNotificatie } = useNotificaties();   
   const [data, setData] = useState<Verhuuraanvraag[] | null>(null);
   const [openstaandeData, setOpenstaandeData] = useState<Verhuuraanvraag[]>([]);
   const [behandeldeData, setBehandeldeData] = useState<Verhuuraanvraag[]>([]);
@@ -51,8 +52,10 @@ export function Verhuuraanvragen() {
           body: JSON.stringify(dto)
         });
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
+        if (response.ok) {
+          addNotificatie("Verhuuraanvraag succesvol behandeld!", "success", false);
+        } else {
+          addNotificatie("Er is iets fout gegaan tijdens het verwerken van de verhuuraanvraag", "error", true);
         }
 
         setOpenstaandeData((prev) => prev.filter((item) => item.verhuuraanvraagID !== aanvraagID));
@@ -104,7 +107,7 @@ export function Verhuuraanvragen() {
 
   return (
     <div>
-      <h1>Controlepaneel CarAndAll vloot</h1>
+      <h1>Verhuuraanvragen beheren</h1>
 
       <div>
         <h2>Openstaande verhuuraanvragen</h2>

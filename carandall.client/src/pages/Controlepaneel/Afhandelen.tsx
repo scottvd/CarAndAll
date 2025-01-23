@@ -78,9 +78,9 @@ export function Afhandelen() {
                     throw new Error(`Foutmelding: ${response.status}`);
                 }
 
-                addNotificatie("Verhuuraanvraag succesvol geaccepteerd!", "success", false)
+                addNotificatie("Voertuig succesvol ingenomen!", "success", false)
             } catch (error) {
-                addNotificatie("Verhuuraanvraag kon niet geaccepteerd worden. Probeer het opnieuw!", "error", true)
+                addNotificatie("Voertuig kon niet ingenomen worden. Probeer het opnieuw!", "error", true)
             }
         }
     };

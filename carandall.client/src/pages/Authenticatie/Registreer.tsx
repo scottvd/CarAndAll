@@ -171,7 +171,7 @@ export function Register() {
 
               <PasswordInput
                 label="Wachtwoord bevestigen"
-                placeholder="Wachtwoord"
+                placeholder="Wachtwoord bevestigen"
                 mt="md"
                 size="md"
                 {...form.getInputProps("wachtwoordBevestiging")}

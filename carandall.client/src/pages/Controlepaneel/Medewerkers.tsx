@@ -256,7 +256,7 @@ export function Medewerkers() {
 
           <PasswordInput
             label="Wachtwoord bevestigen"
-            placeholder="Wachtwoord"
+            placeholder="Wachtwoord bevestigen"
             mt="md"
             size="md"
             {...createFormulier.getInputProps("wachtwoordBevestiging")}

@@ -1,6 +1,7 @@
 import {
   IconAdjustmentsCog,
   IconCar,
+  IconDoorExit,
   IconFileText,
   IconGauge,
   IconUserCircle,
@@ -39,6 +40,10 @@ const mockdata = [
     { label: 'Medewerkers beheren', icon: IconUserCog, link: '/dashboard/controlepaneel' },
     { label: 'Verhuuraanvragen beheren', icon: IconFileText, link: '/dashboard/controlepaneel/verhuuraanvragen' },
     { label: 'Verhuuraanvragen afhandelen', icon: IconFileText, link: '/dashboard/controlepaneel/afhandelen' }
+    ]
+  },
+  { label: 'Uitloggen', icon: IconDoorExit, links: [
+    { label: 'Log uit', link: '/loguit' },
     ]
   }
 ];
