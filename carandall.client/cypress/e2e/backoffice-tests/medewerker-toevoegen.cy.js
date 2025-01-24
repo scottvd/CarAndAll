@@ -38,4 +38,4 @@ describe('Medewerkers toevoegen en wijzigen', () => {
       cy.contains('Er is iets fout gegaan tijdens het toevoegen van de medewerker. Probeer het opnieuw!').should('be.visible');
     });
 });
-  
+    
