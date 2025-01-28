@@ -185,5 +185,25 @@ namespace CarAndAll.Controllers
 
             return false;
         }
+
+        [HttpGet("GebruikerRollen")]
+        public ActionResult<List<string>> GetGebruikerRollen()
+        {
+            try
+            {
+                var gebruikerRollen = _gebruikerRollenService.GetGebruikerRollen();
+
+                if (gebruikerRollen == null || !gebruikerRollen.Any())
+                {
+                    return Unauthorized(new { Message = "Geen rollen gevonden voor de gebruiker.", Rollen = gebruikerRollen });
+                }
+
+                return Ok(gebruikerRollen);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = "Er is een fout opgetreden.", Details = ex.Message });
+            }
+        }
     }
 }
